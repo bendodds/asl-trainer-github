@@ -271,8 +271,7 @@
 
     <div class="bottom-controls">
         <button class="control-btn" onclick="previousWord()">⬅️</button>
-        <button class="control-btn" id="playBtn" onclick="togglePlay()">▶️</button>
-        <button class="control-btn" id="pauseBtn" onclick="pause()">⏸️</button>
+        <button class="control-btn" id="playPauseBtn" onclick="togglePlay()">▶️</button>
         <button class="control-btn" id="helpBtn" onclick="showHelp()">🎦</button>
         <button class="control-btn" onclick="nextWord()">➡️</button>
     </div>
@@ -289,15 +288,13 @@
 
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
-            // Ignore if typing in input fields
-            if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') {
-                return;
-            }
-            
             if (e.code === 'Space') {
                 e.preventDefault();
                 togglePlay();
-            } else if (e.key === 'h' || e.key === 'H') {
+            } else if ((e.key === 'h' || e.key === 'H') && 
+                       e.target.tagName !== 'TEXTAREA' && 
+                       e.target.tagName !== 'INPUT' && 
+                       e.target.tagName !== 'SELECT') {
                 e.preventDefault();
                 showHelp();
             }
@@ -558,7 +555,10 @@
 
             isPlaying = true;
             showingHelp = false;
-            document.getElementById('playBtn').classList.add('active');
+            
+            // Update button to show pause icon
+            document.getElementById('playPauseBtn').innerHTML = '⏸️';
+            document.getElementById('playPauseBtn').classList.add('active');
             
             // Shuffle words when starting to play
             currentWords = shuffleArray(currentWords);
@@ -572,7 +572,10 @@
 
         function pause() {
             isPlaying = false;
-            document.getElementById('playBtn').classList.remove('active');
+            
+            // Update button to show play icon
+            document.getElementById('playPauseBtn').innerHTML = '▶️';
+            document.getElementById('playPauseBtn').classList.remove('active');
             
             if (intervalId) {
                 clearInterval(intervalId);
