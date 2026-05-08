@@ -319,6 +319,12 @@
             if (e.code === 'Space') {
                 e.preventDefault();
                 togglePlay();
+            } else if (e.code === 'ArrowLeft') {
+                e.preventDefault();
+                previousWord();
+            } else if (e.code === 'ArrowRight') {
+                e.preventDefault();
+                nextWordManual();
             } else if ((e.key === 'h' || e.key === 'H') && 
                        e.target.tagName !== 'TEXTAREA' && 
                        e.target.tagName !== 'INPUT' && 
