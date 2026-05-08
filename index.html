@@ -233,6 +233,22 @@
             color: #fff;
             text-align: center;
         }
+
+        .timer-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+
+        .timer-progress {
+            height: 100%;
+            background: #fff;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
     </style>
 </head>
 <body>
@@ -282,6 +298,10 @@
     </div>
 
     <div class="stats" id="stats"></div>
+    
+    <div class="timer-bar" id="timerBar" style="display: none;">
+        <div class="timer-progress" id="timerProgress"></div>
+    </div>
 
     <script>
         let allWords = [];
@@ -290,6 +310,9 @@
         let isPlaying = false;
         let intervalId = null;
         let showingHelp = false;
+        let timerIntervalId = null;
+        let timerStartTime = null;
+        let timerDuration = 0;
 
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
@@ -538,6 +561,36 @@
             return shuffled;
         }
 
+        function updateTimer() {
+            if (!isPlaying) return;
+            
+            const elapsed = Date.now() - timerStartTime;
+            const progress = Math.min((elapsed / timerDuration) * 100, 100);
+            
+            document.getElementById('timerProgress').style.width = progress + '%';
+        }
+
+        function startTimer() {
+            timerStartTime = Date.now();
+            timerDuration = parseInt(document.getElementById('intervalInput').value) * 1000;
+            document.getElementById('timerBar').style.display = 'block';
+            document.getElementById('timerProgress').style.width = '0%';
+            
+            // Update timer every 100ms for smooth animation
+            if (timerIntervalId) {
+                clearInterval(timerIntervalId);
+            }
+            timerIntervalId = setInterval(updateTimer, 100);
+        }
+
+        function stopTimer() {
+            document.getElementById('timerBar').style.display = 'none';
+            if (timerIntervalId) {
+                clearInterval(timerIntervalId);
+                timerIntervalId = null;
+            }
+        }
+
         function nextWord() {
             if (currentWords.length === 0) return;
             
@@ -551,6 +604,11 @@
             
             showingHelp = false;
             displayCard();
+            
+            // Restart timer for next word
+            if (isPlaying) {
+                startTimer();
+            }
         }
 
         function previousWord() {
@@ -599,6 +657,7 @@
             const interval = parseInt(document.getElementById('intervalInput').value) * 1000;
             
             displayCard();
+            startTimer();
             intervalId = setInterval(nextWord, interval);
         }
 
@@ -608,6 +667,8 @@
             // Update button to show play icon
             document.getElementById('playPauseBtn').innerHTML = '▶️';
             document.getElementById('playPauseBtn').classList.remove('active');
+            
+            stopTimer();
             
             if (intervalId) {
                 clearInterval(intervalId);
