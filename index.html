@@ -118,8 +118,8 @@
             border-radius: 20px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
             padding: 60px;
-            min-width: 500px;
-            min-height: 400px;
+            min-width: 700px;
+            min-height: 500px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -132,7 +132,7 @@
         }
 
         .word {
-            font-size: 72px;
+            font-size: 96px;
             font-weight: bold;
             color: #333;
             margin-bottom: 10px;
@@ -166,7 +166,6 @@
             max-width: 100%;
             border-radius: 10px;
             background: #f0f0f0;
-            border: 3px solid red;
         }
 
         .embed-container iframe {
@@ -175,7 +174,6 @@
             left: 0;
             width: 100%;
             height: 100%;
-            border: 3px solid blue;
         }
 
         .no-video {
@@ -253,6 +251,7 @@
                 <textarea id="csvInput" placeholder="category,word,video_url&#10;animals,dog,https://youtube.com/...&#10;animals,cat,"></textarea>
                 <div style="display: flex; gap: 10px; margin-top: 10px;">
                     <button class="btn btn-small" onclick="loadData()">Load Data</button>
+                    <button class="btn btn-small" onclick="loadDefaultList()">Load Default List</button>
                     <button class="btn btn-small" onclick="clearData()">Clear All</button>
                 </div>
             </div>
@@ -274,7 +273,7 @@
         <button class="control-btn" onclick="previousWord()">⬅️</button>
         <button class="control-btn" id="playBtn" onclick="togglePlay()">▶️</button>
         <button class="control-btn" id="pauseBtn" onclick="pause()">⏸️</button>
-        <button class="control-btn" id="helpBtn" onclick="showHelp()">❔</button>
+        <button class="control-btn" id="helpBtn" onclick="showHelp()">🎦</button>
         <button class="control-btn" onclick="nextWord()">➡️</button>
     </div>
 
@@ -288,6 +287,22 @@
         let intervalId = null;
         let showingHelp = false;
 
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Ignore if typing in input fields
+            if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') {
+                return;
+            }
+            
+            if (e.code === 'Space') {
+                e.preventDefault();
+                togglePlay();
+            } else if (e.key === 'h' || e.key === 'H') {
+                e.preventDefault();
+                showHelp();
+            }
+        });
+
         // Load data from localStorage on page load
         window.addEventListener('load', () => {
             const stored = localStorage.getItem('aslTrainerData');
@@ -298,6 +313,56 @@
                 updateStats();
             }
         });
+
+        function loadDefaultList() {
+            fetch('defaultwords.csv')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Could not load defaultwords.csv');
+                    }
+                    return response.text();
+                })
+                .then(csv => {
+                    const lines = csv.split('\n');
+                    const newWords = [];
+
+                    for (let i = 0; i < lines.length; i++) {
+                        const line = lines[i].trim();
+                        if (!line) continue;
+
+                        // Skip header if it looks like one
+                        if (i === 0 && line.toLowerCase().includes('category') && line.toLowerCase().includes('word')) {
+                            continue;
+                        }
+
+                        const parts = line.split(',').map(p => p.trim());
+                        if (parts.length >= 2) {
+                            newWords.push({
+                                category: parts[0],
+                                word: parts[1],
+                                video_url: parts[2] || ''
+                            });
+                        }
+                    }
+
+                    if (newWords.length === 0) {
+                        alert('No valid data found in defaultwords.csv');
+                        return;
+                    }
+
+                    allWords = newWords;
+                    localStorage.setItem('aslTrainerData', JSON.stringify(allWords));
+                    
+                    populateCategories();
+                    filterWords();
+                    updateStats();
+                    alert(`Loaded ${newWords.length} words from default list!`);
+                })
+                .catch(error => {
+                    alert('Error loading default list: ' + error.message);
+                    console.error(error);
+                });
+        }
 
         function loadData() {
             const csv = document.getElementById('csvInput').value.trim();
@@ -416,8 +481,6 @@
                 content.innerHTML = `
                     <div class="word" style="margin-top: 20px;">${word.word}</div>
                     <div class="category-badge">${word.category}</div>
-                    <div style="font-size: 12px; color: #999; margin-top: 10px;">${videoUrl}</div>
-                    <div style="font-size: 12px; color: #999;">Display: ${videoPlayer.style.display}</div>
                 `;
             } else if (showingHelp && !word.video_url) {
                 videoPlayer.style.display = 'none';
