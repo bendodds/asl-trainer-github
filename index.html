@@ -479,11 +479,11 @@
                 videoPlayer.style.display = 'block';
                 // Clean up double slashes but keep them if that's what LifePrint uses
                 let videoUrl = word.video_url;
-                // Use semicolon like LifePrint does
+                // Use autoplay with mute - browsers block autoplay with sound
                 if (!videoUrl.includes('?')) {
-                    videoUrl += '?rel=0;autoplay=1';
+                    videoUrl += '?autoplay=1&mute=1&rel=0';
                 } else if (!videoUrl.includes('autoplay')) {
-                    videoUrl += ';autoplay=1';
+                    videoUrl += '&autoplay=1&mute=1';
                 }
                 console.log('Loading video URL:', videoUrl);
                 console.log('Video player element:', document.getElementById('videoPlayer'));
@@ -495,6 +495,9 @@
                 content.innerHTML = `
                     <div class="word" style="margin-top: 20px;">${word.word}</div>
                     <div class="category-badge">${word.category}</div>
+                    <div style="font-size: 14px; color: #999; margin-top: 15px;">
+                        💡 Video will be muted for autoplay. Click to unmute.
+                    </div>
                 `;
             } else if (showingHelp && !word.video_url) {
                 header.style.display = 'none';
