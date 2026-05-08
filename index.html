@@ -213,6 +213,11 @@
             transform: translateY(0);
         }
 
+        .control-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
         .control-btn.active {
             background: #667eea;
         }
@@ -273,7 +278,7 @@
         <button class="control-btn" onclick="previousWord()">⬅️</button>
         <button class="control-btn" id="playPauseBtn" onclick="togglePlay()">▶️</button>
         <button class="control-btn" id="helpBtn" onclick="showHelp()">🎦</button>
-        <button class="control-btn" onclick="nextWord()">➡️</button>
+        <button class="control-btn" onclick="nextWordManual()">➡️</button>
     </div>
 
     <div class="stats" id="stats"></div>
@@ -450,15 +455,24 @@
             const content = document.getElementById('cardContent');
             const videoPlayer = document.getElementById('videoPlayer');
             const header = document.querySelector('.header');
+            const helpBtn = document.getElementById('helpBtn');
             
             if (currentWords.length === 0) {
                 content.innerHTML = '<div class="empty-state">No words available</div>';
                 videoPlayer.style.display = 'none';
                 header.style.display = 'flex';
+                helpBtn.disabled = true;
                 return;
             }
 
             const word = currentWords[currentIndex];
+            
+            // Enable/disable help button based on video availability
+            if (word.video_url && word.video_url.trim() !== '') {
+                helpBtn.disabled = false;
+            } else {
+                helpBtn.disabled = true;
+            }
             
             if (showingHelp && word.video_url) {
                 header.style.display = 'none';
@@ -524,7 +538,6 @@
         function nextWord() {
             if (currentWords.length === 0) return;
             
-            pause(); // Pause auto-play when manually navigating
             currentIndex = (currentIndex + 1) % currentWords.length;
             showingHelp = false;
             displayCard();
@@ -535,6 +548,15 @@
             
             pause(); // Pause auto-play when manually navigating
             currentIndex = (currentIndex - 1 + currentWords.length) % currentWords.length;
+            showingHelp = false;
+            displayCard();
+        }
+
+        function nextWordManual() {
+            if (currentWords.length === 0) return;
+            
+            pause(); // Pause auto-play when manually navigating
+            currentIndex = (currentIndex + 1) % currentWords.length;
             showingHelp = false;
             displayCard();
         }
