@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASL Trainer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .control-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        select, input[type="number"] {
+            padding: 8px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        select:focus, input[type="number"]:focus {
+            border-color: #667eea;
+        }
+
+        .data-controls {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .data-controls textarea {
+            width: 300px;
+            height: 100px;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            resize: vertical;
+            outline: none;
+        }
+
+        .data-controls textarea:focus {
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+        }
+
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 60px;
+            min-width: 500px;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .card-content {
+            width: 100%;
+        }
+
+        .word {
+            font-size: 72px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .category-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .video-container {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        #videoPlayer {
+            width: 100%;
+        }
+
+        .embed-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            width: 100%;
+            max-width: 100%;
+            border-radius: 10px;
+            background: #f0f0f0;
+            border: 3px solid red;
+        }
+
+        .embed-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 3px solid blue;
+        }
+
+        .no-video {
+            font-size: 24px;
+            color: #999;
+            padding: 40px;
+        }
+
+        .bottom-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .control-btn {
+            background: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .control-btn:active {
+            transform: translateY(0);
+        }
+
+        .control-btn.active {
+            background: #667eea;
+        }
+
+        .empty-state {
+            font-size: 18px;
+            color: #666;
+        }
+
+        .stats {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #fff;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="controls">
+            <div class="control-group">
+                <label>Category</label>
+                <select id="categorySelect">
+                    <option value="all">All</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Interval (seconds)</label>
+                <input type="number" id="intervalInput" value="5" min="1" max="60">
+            </div>
+        </div>
+
+        <div class="data-controls">
+            <div class="control-group">
+                <label>Load CSV Data</label>
+                <textarea id="csvInput" placeholder="category,word,video_url&#10;animals,dog,https://youtube.com/...&#10;animals,cat,"></textarea>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button class="btn btn-small" onclick="loadData()">Load Data</button>
+                    <button class="btn btn-small" onclick="clearData()">Clear All</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="card">
+            <div class="embed-container" id="videoPlayer" style="display: none;">
+                <iframe name="asl_player" id="asl_player" src="about:blank"></iframe>
+            </div>
+            <div class="card-content" id="cardContent">
+                <div class="empty-state">Load CSV data to begin</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-controls">
+        <button class="control-btn" onclick="previousWord()">⬅️</button>
+        <button class="control-btn" id="playBtn" onclick="togglePlay()">▶️</button>
+        <button class="control-btn" id="pauseBtn" onclick="pause()">⏸️</button>
+        <button class="control-btn" id="helpBtn" onclick="showHelp()">❔</button>
+        <button class="control-btn" onclick="nextWord()">➡️</button>
+    </div>
+
+    <div class="stats" id="stats"></div>
+
+    <script>
+        let allWords = [];
+        let currentWords = [];
+        let currentIndex = 0;
+        let isPlaying = false;
+        let intervalId = null;
+        let showingHelp = false;
+
+        // Load data from localStorage on page load
+        window.addEventListener('load', () => {
+            const stored = localStorage.getItem('aslTrainerData');
+            if (stored) {
+                allWords = JSON.parse(stored);
+                populateCategories();
+                filterWords();
+                updateStats();
+            }
+        });
+
+        function loadData() {
+            const csv = document.getElementById('csvInput').value.trim();
+            if (!csv) {
+                alert('Please enter CSV data');
+                return;
+            }
+
+            const lines = csv.split('\n');
+            const newWords = [];
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+
+                // Skip header if it looks like one
+                if (i === 0 && line.toLowerCase().includes('category') && line.toLowerCase().includes('word')) {
+                    continue;
+                }
+
+                const parts = line.split(',').map(p => p.trim());
+                if (parts.length >= 2) {
+                    newWords.push({
+                        category: parts[0],
+                        word: parts[1],
+                        video_url: parts[2] || ''
+                    });
+                }
+            }
+
+            if (newWords.length === 0) {
+                alert('No valid data found');
+                return;
+            }
+
+            allWords = newWords;
+            localStorage.setItem('aslTrainerData', JSON.stringify(allWords));
+            
+            populateCategories();
+            filterWords();
+            updateStats();
+            document.getElementById('csvInput').value = '';
+            alert(`Loaded ${newWords.length} words!`);
+        }
+
+        function clearData() {
+            if (confirm('Are you sure you want to clear all data?')) {
+                allWords = [];
+                currentWords = [];
+                currentIndex = 0;
+                localStorage.removeItem('aslTrainerData');
+                pause();
+                populateCategories();
+                displayCard();
+                updateStats();
+            }
+        }
+
+        function populateCategories() {
+            const select = document.getElementById('categorySelect');
+            const categories = new Set(allWords.map(w => w.category));
+            
+            select.innerHTML = '<option value="all">All</option>';
+            categories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat;
+                option.textContent = cat;
+                select.appendChild(option);
+            });
+        }
+
+        function filterWords() {
+            const category = document.getElementById('categorySelect').value;
+            
+            if (category === 'all') {
+                currentWords = [...allWords];
+            } else {
+                currentWords = allWords.filter(w => w.category === category);
+            }
+
+            currentIndex = 0;
+            showingHelp = false;
+            displayCard();
+            updateStats();
+        }
+
+        function displayCard() {
+            const content = document.getElementById('cardContent');
+            const videoPlayer = document.getElementById('videoPlayer');
+            
+            if (currentWords.length === 0) {
+                content.innerHTML = '<div class="empty-state">No words available</div>';
+                videoPlayer.style.display = 'none';
+                return;
+            }
+
+            const word = currentWords[currentIndex];
+            
+            if (showingHelp && word.video_url) {
+                videoPlayer.style.display = 'block';
+                // Clean up double slashes but keep them if that's what LifePrint uses
+                let videoUrl = word.video_url;
+                // Use semicolon like LifePrint does
+                if (!videoUrl.includes('?')) {
+                    videoUrl += '?rel=0;autoplay=1';
+                } else if (!videoUrl.includes('autoplay')) {
+                    videoUrl += ';autoplay=1';
+                }
+                console.log('Loading video URL:', videoUrl);
+                console.log('Video player element:', document.getElementById('videoPlayer'));
+                console.log('IFrame element:', document.getElementById('asl_player'));
+                
+                const iframe = document.getElementById('asl_player');
+                iframe.src = videoUrl;
+                
+                content.innerHTML = `
+                    <div class="word" style="margin-top: 20px;">${word.word}</div>
+                    <div class="category-badge">${word.category}</div>
+                    <div style="font-size: 12px; color: #999; margin-top: 10px;">${videoUrl}</div>
+                    <div style="font-size: 12px; color: #999;">Display: ${videoPlayer.style.display}</div>
+                `;
+            } else if (showingHelp && !word.video_url) {
+                videoPlayer.style.display = 'none';
+                content.innerHTML = '<div class="no-video">No Video Defined</div>';
+            } else {
+                videoPlayer.style.display = 'none';
+                content.innerHTML = `
+                    <div class="word">${word.word}</div>
+                    <div class="category-badge">${word.category}</div>
+                `;
+            }
+        }
+
+        function extractYouTubeId(url) {
+            // Clean up URL (remove double slashes after embed/)
+            url = url.replace(/\/embed\/\//, '/embed/');
+            
+            const patterns = [
+                /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+                /^([a-zA-Z0-9_-]{11})$/
+            ];
+            
+            for (const pattern of patterns) {
+                const match = url.match(pattern);
+                if (match) return match[1];
+            }
+            return null;
+        }
+
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function nextWord() {
+            if (currentWords.length === 0) return;
+            
+            pause(); // Pause auto-play when manually navigating
+            currentIndex = (currentIndex + 1) % currentWords.length;
+            showingHelp = false;
+            displayCard();
+        }
+
+        function previousWord() {
+            if (currentWords.length === 0) return;
+            
+            pause(); // Pause auto-play when manually navigating
+            currentIndex = (currentIndex - 1 + currentWords.length) % currentWords.length;
+            showingHelp = false;
+            displayCard();
+        }
+
+        function togglePlay() {
+            if (isPlaying) {
+                pause();
+            } else {
+                play();
+            }
+        }
+
+        function play() {
+            if (currentWords.length === 0) {
+                alert('No words to practice. Please load data first.');
+                return;
+            }
+
+            isPlaying = true;
+            showingHelp = false;
+            document.getElementById('playBtn').classList.add('active');
+            
+            // Shuffle words when starting to play
+            currentWords = shuffleArray(currentWords);
+            currentIndex = 0;
+            
+            const interval = parseInt(document.getElementById('intervalInput').value) * 1000;
+            
+            displayCard();
+            intervalId = setInterval(nextWord, interval);
+        }
+
+        function pause() {
+            isPlaying = false;
+            document.getElementById('playBtn').classList.remove('active');
+            
+            if (intervalId) {
+                clearInterval(intervalId);
+                intervalId = null;
+            }
+        }
+
+        function showHelp() {
+            pause();
+            
+            if (currentWords.length === 0) {
+                alert('No words available');
+                return;
+            }
+            
+            showingHelp = true;
+            displayCard();
+        }
+
+        function updateStats() {
+            const stats = document.getElementById('stats');
+            if (allWords.length > 0) {
+                stats.textContent = `Total words: ${allWords.length} | Current set: ${currentWords.length}`;
+            } else {
+                stats.textContent = '';
+            }
+        }
+
+        // Event listeners
+        document.getElementById('categorySelect').addEventListener('change', filterWords);
+    </script>
+</body>
+</html>
