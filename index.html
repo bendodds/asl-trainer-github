@@ -308,11 +308,11 @@
         let currentWords = [];
         let currentIndex = 0;
         let isPlaying = false;
-        let intervalId = null;
         let showingHelp = false;
         let timerIntervalId = null;
         let timerStartTime = null;
         let timerDuration = 0;
+        let nextWordTime = null;
 
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
@@ -571,26 +571,29 @@
         function updateTimer() {
             if (!isPlaying) return;
             
-            const elapsed = Date.now() - timerStartTime;
+            const now = Date.now();
+            const elapsed = now - timerStartTime;
             const progress = Math.min((elapsed / timerDuration) * 100, 100);
-            
             document.getElementById('timerProgress').style.width = progress + '%';
+
+            if (nextWordTime && now >= nextWordTime) {
+                nextWordTime = null; // prevent double-fire before nextWord resets it
+                nextWord();
+            }
         }
 
         function startTimer() {
             timerStartTime = Date.now();
             timerDuration = parseInt(document.getElementById('intervalInput').value) * 1000;
+            nextWordTime = timerStartTime + timerDuration;
             document.getElementById('timerBar').style.display = 'block';
             document.getElementById('timerProgress').style.width = '0%';
-            
-            // Update timer every 100ms for smooth animation
-            if (timerIntervalId) {
-                clearInterval(timerIntervalId);
-            }
+            if (timerIntervalId) clearInterval(timerIntervalId);
             timerIntervalId = setInterval(updateTimer, 100);
         }
 
         function stopTimer() {
+            nextWordTime = null;
             document.getElementById('timerBar').style.display = 'none';
             if (timerIntervalId) {
                 clearInterval(timerIntervalId);
@@ -610,11 +613,8 @@
             unloadVideo();
             document.getElementById('playPauseBtn').innerHTML = '⏸️';
             document.getElementById('playPauseBtn').classList.add('active');
-            if (intervalId) clearInterval(intervalId);
-            const interval = parseInt(document.getElementById('intervalInput').value) * 1000;
             displayCard();
             startTimer();
-            intervalId = setInterval(nextWord, interval);
         }
 
         function nextWord() {
@@ -681,17 +681,9 @@
 
         function pause() {
             isPlaying = false;
-            
-            // Update button to show play icon
             document.getElementById('playPauseBtn').innerHTML = '▶️';
             document.getElementById('playPauseBtn').classList.remove('active');
-            
             stopTimer();
-            
-            if (intervalId) {
-                clearInterval(intervalId);
-                intervalId = null;
-            }
         }
 
         function showHelp() {
