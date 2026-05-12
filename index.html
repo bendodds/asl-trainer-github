@@ -469,9 +469,9 @@
             const category = document.getElementById('categorySelect').value;
             
             if (category === 'all') {
-                currentWords = [...allWords];
+                currentWords = shuffleArray([...allWords]);
             } else {
-                currentWords = allWords.filter(w => w.category === category);
+                currentWords = shuffleArray(allWords.filter(w => w.category === category));
             }
 
             currentIndex = 0;
@@ -535,6 +535,7 @@
             } else {
                 header.style.display = 'flex';
                 videoPlayer.style.display = 'none';
+                document.getElementById('asl_player').src = '';
                 content.innerHTML = `
                     <div class="word">${word.word}</div>
                     <div class="category-badge">${word.category}</div>
@@ -597,21 +598,33 @@
             }
         }
 
+        function unloadVideo() {
+            document.getElementById('asl_player').src = '';
+        }
+
+        // Resume auto-play from the current word/index without reshuffling
+        function resumePlay() {
+            if (currentWords.length === 0) return;
+            isPlaying = true;
+            showingHelp = false;
+            unloadVideo();
+            document.getElementById('playPauseBtn').innerHTML = '⏸️';
+            document.getElementById('playPauseBtn').classList.add('active');
+            if (intervalId) clearInterval(intervalId);
+            const interval = parseInt(document.getElementById('intervalInput').value) * 1000;
+            displayCard();
+            startTimer();
+            intervalId = setInterval(nextWord, interval);
+        }
+
         function nextWord() {
             if (currentWords.length === 0) return;
             
-            currentIndex = (currentIndex + 1);
-            
-            // When we reach the end, reshuffle and start over
-            if (currentIndex >= currentWords.length) {
-                currentWords = shuffleArray(currentWords);
-                currentIndex = 0;
-            }
+            currentIndex = (currentIndex + 1) % currentWords.length;
             
             showingHelp = false;
             displayCard();
             
-            // Restart timer for next word
             if (isPlaying) {
                 startTimer();
             }
@@ -619,24 +632,38 @@
 
         function previousWord() {
             if (currentWords.length === 0) return;
-            
-            pause(); // Pause auto-play when manually navigating
-            currentIndex = (currentIndex - 1 + currentWords.length) % currentWords.length;
-            showingHelp = false;
-            displayCard();
+            if (showingHelp) {
+                // Return to the current word and resume playing
+                resumePlay();
+            } else {
+                pause();
+                currentIndex = (currentIndex - 1 + currentWords.length) % currentWords.length;
+                showingHelp = false;
+                displayCard();
+            }
         }
 
         function nextWordManual() {
             if (currentWords.length === 0) return;
-            
-            pause(); // Pause auto-play when manually navigating
-            currentIndex = (currentIndex + 1) % currentWords.length;
-            showingHelp = false;
-            displayCard();
+            if (showingHelp) {
+                // Advance to next word and resume playing
+                showingHelp = false;
+                unloadVideo();
+                currentIndex = (currentIndex + 1) % currentWords.length;
+                resumePlay();
+            } else {
+                pause();
+                currentIndex = (currentIndex + 1) % currentWords.length;
+                showingHelp = false;
+                displayCard();
+            }
         }
 
         function togglePlay() {
-            if (isPlaying) {
+            if (showingHelp) {
+                // Return to current word and start playing
+                resumePlay();
+            } else if (isPlaying) {
                 pause();
             } else {
                 play();
@@ -648,23 +675,8 @@
                 alert('No words to practice. Please load data first.');
                 return;
             }
-
-            isPlaying = true;
-            showingHelp = false;
-            
-            // Update button to show pause icon
-            document.getElementById('playPauseBtn').innerHTML = '⏸️';
-            document.getElementById('playPauseBtn').classList.add('active');
-            
-            // Shuffle words when starting to play
-            currentWords = shuffleArray(currentWords);
             currentIndex = 0;
-            
-            const interval = parseInt(document.getElementById('intervalInput').value) * 1000;
-            
-            displayCard();
-            startTimer();
-            intervalId = setInterval(nextWord, interval);
+            resumePlay();
         }
 
         function pause() {
