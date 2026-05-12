@@ -468,12 +468,20 @@
         function filterWords() {
             const category = document.getElementById('categorySelect').value;
             
-            if (category === 'all') {
-                currentWords = shuffleArray([...allWords]);
-            } else {
-                currentWords = shuffleArray(allWords.filter(w => w.category === category));
-            }
+            const filtered = category === 'all'
+                ? [...allWords]
+                : allWords.filter(w => w.category === category);
 
+            // Remove duplicates by word text (case-insensitive), keeping first occurrence
+            const seen = new Set();
+            const deduped = filtered.filter(w => {
+                const key = w.word.toLowerCase().trim();
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+            });
+
+            currentWords = shuffleArray(deduped);
             currentIndex = 0;
             showingHelp = false;
             displayCard();
