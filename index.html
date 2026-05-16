@@ -1,721 +1,2029 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ASL Trainer</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-        }
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+          Cantarell, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+      }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 20px;
-        }
+      .header {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        z-index: 10;
+      }
 
-        .controls {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
+      .controls {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background: white;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
 
-        .control-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
+      .control-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
 
-        .control-group label {
-            font-size: 12px;
-            font-weight: 600;
-            color: #555;
-        }
+      .control-group label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #555;
+      }
 
-        select, input[type="number"] {
-            padding: 8px;
-            border: 2px solid #e0e0e0;
-            border-radius: 5px;
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.3s;
-        }
+      select,
+      input[type="number"] {
+        padding: 8px;
+        border: 2px solid #e0e0e0;
+        border-radius: 5px;
+        font-size: 14px;
+        outline: none;
+        transition: border-color 0.3s;
+      }
 
-        select:focus, input[type="number"]:focus {
-            border-color: #667eea;
-        }
+      select:focus,
+      input[type="number"]:focus {
+        border-color: #667eea;
+      }
 
-        .data-controls {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
+      .btn {
+        padding: 8px 16px;
+        background: #667eea;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        transition: background 0.3s;
+      }
 
-        .data-controls textarea {
-            width: 300px;
-            height: 100px;
-            padding: 10px;
-            border: 2px solid #e0e0e0;
-            border-radius: 5px;
-            font-family: monospace;
-            font-size: 12px;
-            resize: vertical;
-            outline: none;
-        }
+      .btn:hover {
+        background: #5568d3;
+      }
 
-        .data-controls textarea:focus {
-            border-color: #667eea;
-        }
+      .btn-secondary {
+        background: #764ba2;
+      }
 
-        .btn {
-            padding: 8px 16px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: background 0.3s;
-        }
+      .btn-secondary:hover {
+        background: #5a3a7e;
+      }
 
-        .btn:hover {
-            background: #5568d3;
-        }
+      .btn-small {
+        padding: 5px 10px;
+        font-size: 12px;
+      }
 
-        .btn-small {
-            padding: 5px 10px;
-            font-size: 12px;
-        }
+      .main-container {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
 
-        .main-container {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+      .card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        padding: 60px;
+        min-width: 700px;
+        min-height: 500px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
 
-        .card {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            padding: 60px;
-            min-width: 700px;
-            min-height: 500px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
+      .card-content {
+        width: 100%;
+      }
 
-        .card-content {
-            width: 100%;
-        }
+      .word {
+        font-size: 96px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 10px;
+      }
 
-        .word {
-            font-size: 96px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 10px;
-        }
+      .category-badge {
+        display: inline-block;
+        background: #667eea;
+        color: white;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+      }
 
-        .category-badge {
-            display: inline-block;
-            background: #667eea;
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-        }
+      .video-container {
+        width: 100%;
+        margin-bottom: 20px;
+      }
 
-        .video-container {
-            width: 100%;
-            margin-bottom: 20px;
-        }
+      #videoPlayer {
+        width: 100%;
+      }
 
-        #videoPlayer {
-            width: 100%;
-        }
+      .embed-container {
+        position: relative;
+        padding-bottom: 56.25%;
+        height: 0;
+        overflow: hidden;
+        width: 100%;
+        max-width: 100%;
+        border-radius: 10px;
+        background: #f0f0f0;
+      }
 
-        .embed-container {
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            overflow: hidden;
-            width: 100%;
-            max-width: 100%;
-            border-radius: 10px;
-            background: #f0f0f0;
-        }
+      .embed-container iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
 
-        .embed-container iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
+      .no-video {
+        font-size: 24px;
+        color: #999;
+        padding: 40px;
+      }
 
-        .no-video {
-            font-size: 24px;
-            color: #999;
-            padding: 40px;
-        }
+      .bottom-controls {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 20px;
+      }
 
-        .bottom-controls {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 20px;
-        }
+      .control-btn {
+        background: white;
+        border: none;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        font-size: 24px;
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
 
-        .control-btn {
-            background: white;
-            border: none;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            font-size: 24px;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s, box-shadow 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+      .control-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      }
 
-        .control-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        }
+      .control-btn:active {
+        transform: translateY(0);
+      }
 
-        .control-btn:active {
-            transform: translateY(0);
-        }
+      .control-btn:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
 
-        .control-btn:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
+      .control-btn.active {
+        background: #667eea;
+      }
 
-        .control-btn.active {
-            background: #667eea;
-        }
+      .empty-state {
+        font-size: 18px;
+        color: #666;
+      }
 
-        .empty-state {
-            font-size: 18px;
-            color: #666;
-        }
+      .stats {
+        margin-top: 20px;
+        font-size: 14px;
+        color: #fff;
+        text-align: center;
+      }
 
-        .stats {
-            margin-top: 20px;
-            font-size: 14px;
-            color: #fff;
-            text-align: center;
-        }
+      .timer-bar {
+        width: 100%;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 2px;
+        overflow: hidden;
+        margin-top: 15px;
+      }
 
-        .timer-bar {
-            width: 100%;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 2px;
-            overflow: hidden;
-            margin-top: 15px;
-        }
-
-        .timer-progress {
-            height: 100%;
-            background: #fff;
-            width: 0%;
-            transition: width 0.1s linear;
-        }
+      .timer-progress {
+        height: 100%;
+        background: #fff;
+        width: 0%;
+        transition: width 0.1s linear;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="header">
-        <div class="controls">
-            <div class="control-group">
-                <label>Category</label>
-                <select id="categorySelect">
-                    <option value="all">All</option>
-                </select>
-            </div>
-            <div class="control-group">
-                <label>Interval (seconds)</label>
-                <input type="number" id="intervalInput" value="5" min="1" max="60">
-            </div>
+      <div class="controls">
+        <div class="control-group">
+          <label>Category</label>
+          <select id="categorySelect">
+            <option value="all">All</option>
+          </select>
         </div>
-
-        <div class="data-controls">
-            <div class="control-group">
-                <label>Load CSV Data</label>
-                <textarea id="csvInput" placeholder="category,word,video_url&#10;animals,dog,https://youtube.com/...&#10;animals,cat,"></textarea>
-                <div style="display: flex; gap: 10px; margin-top: 10px;">
-                    <button class="btn btn-small" onclick="loadData()">Load Data</button>
-                    <button class="btn btn-small" onclick="loadDefaultList()">Load Default List</button>
-                    <button class="btn btn-small" onclick="clearData()">Clear All</button>
-                </div>
-            </div>
+        <div class="control-group">
+          <label>Interval (seconds)</label>
+          <input type="number" id="intervalInput" value="5" min="1" max="60" />
         </div>
+        <button
+          class="btn btn-secondary"
+          id="switchListBtn"
+          onclick="switchWordList()"
+        >
+          Switch to Top 1000
+        </button>
+      </div>
     </div>
 
     <div class="main-container">
-        <div class="card">
-            <div class="embed-container" id="videoPlayer" style="display: none;">
-                <iframe name="asl_player" id="asl_player" src="about:blank" allow="autoplay; encrypted-media"></iframe>
-            </div>
-            <div class="card-content" id="cardContent">
-                <div class="empty-state">Load CSV data to begin</div>
-            </div>
+      <div class="card">
+        <div class="embed-container" id="videoPlayer" style="display: none">
+          <iframe
+            name="asl_player"
+            id="asl_player"
+            src="about:blank"
+            allow="autoplay; encrypted-media"
+          ></iframe>
         </div>
+        <div class="card-content" id="cardContent">
+          <div class="empty-state">Loading word list...</div>
+        </div>
+      </div>
     </div>
 
     <div class="bottom-controls">
-        <button class="control-btn" onclick="previousWord()">⬅️</button>
-        <button class="control-btn" id="playPauseBtn" onclick="togglePlay()">▶️</button>
-        <button class="control-btn" id="helpBtn" onclick="showHelp()">🎦</button>
-        <button class="control-btn" onclick="nextWordManual()">➡️</button>
+      <button class="control-btn" onclick="previousWord()">⬅️</button>
+      <button class="control-btn" id="playPauseBtn" onclick="togglePlay()">
+        ▶️
+      </button>
+      <button class="control-btn" id="helpBtn" onclick="showHelp()">🎦</button>
+      <button class="control-btn" onclick="nextWordManual()">➡️</button>
     </div>
 
     <div class="stats" id="stats"></div>
-    
-    <div class="timer-bar" id="timerBar" style="display: none;">
-        <div class="timer-progress" id="timerProgress"></div>
+
+    <div class="timer-bar" id="timerBar" style="display: none">
+      <div class="timer-progress" id="timerProgress"></div>
     </div>
 
     <script>
-        let allWords = [];
-        let currentWords = [];
-        let currentIndex = 0;
-        let isPlaying = false;
-        let showingHelp = false;
-        let timerIntervalId = null;
-        let timerStartTime = null;
-        let timerDuration = 0;
-        let nextWordTime = null;
+      let allWords = [];
+      let currentWords = [];
+      let currentIndex = 0;
+      let isPlaying = false;
+      let showingHelp = false;
+      let timerIntervalId = null;
+      let timerStartTime = null;
+      let timerDuration = 0;
+      let nextWordTime = null;
 
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            if (e.code === 'Space') {
-                e.preventDefault();
-                togglePlay();
-            } else if (e.code === 'ArrowLeft') {
-                e.preventDefault();
-                previousWord();
-            } else if (e.code === 'ArrowRight') {
-                e.preventDefault();
-                nextWordManual();
-            } else if ((e.key === 'h' || e.key === 'H') && 
-                       e.target.tagName !== 'TEXTAREA' && 
-                       e.target.tagName !== 'INPUT' && 
-                       e.target.tagName !== 'SELECT') {
-                e.preventDefault();
-                showHelp();
-            }
+      // Keyboard shortcuts
+      document.addEventListener("keydown", (e) => {
+        if (e.code === "Space") {
+          e.preventDefault();
+          togglePlay();
+        } else if (e.code === "ArrowLeft") {
+          e.preventDefault();
+          previousWord();
+        } else if (e.code === "ArrowRight") {
+          e.preventDefault();
+          nextWordManual();
+        } else if (
+          (e.key === "h" || e.key === "H") &&
+          e.target.tagName !== "TEXTAREA" &&
+          e.target.tagName !== "INPUT" &&
+          e.target.tagName !== "SELECT"
+        ) {
+          e.preventDefault();
+          showHelp();
+        }
+      });
+
+      const TOP1000_CSV = `Top1000,ability,https://www.youtube.com/embed//TDN9SnM7xgQ
+Top1000,able,https://www.youtube.com/embed//mEgQI-DHntY
+Top1000,about,https://www.youtube.com/embed//Rb60Ad_K-as
+Top1000,above,https://www.youtube.com/embed//jQC2QdxW9u0
+Top1000,accept,https://www.youtube.com/embed//SIIsK0AV2iw
+Top1000,according,https://www.youtube.com/embed//U23f1j2iE1I
+Top1000,account,https://www.youtube.com/embed//LSK-GxyIKFg
+Top1000,across,https://www.youtube.com/embed//k1Fel03G3bo
+Top1000,act,https://www.youtube.com/embed//iWQoy4YwCbY
+Top1000,action,https://www.youtube.com/embed//NX-tvMEUoH8
+Top1000,activity,https://www.youtube.com/embed//3ktEBFhaLrA
+Top1000,actually,https://www.youtube.com/embed//rbYcT4-3wiI
+Top1000,add,https://www.youtube.com/embed//UW8kPYNv55A
+Top1000,address,https://www.youtube.com/embed//jJ7aBDd_TvI
+Top1000,administration,https://www.youtube.com/embed//toPcpUArByc
+Top1000,admit,https://www.youtube.com/embed//yUbsYC5nE3M
+Top1000,adult,https://www.youtube.com/embed//WqmgCc3dAZk
+Top1000,affect,https://www.youtube.com/embed//LaYeCI9ieyU
+Top1000,after,https://www.youtube.com/embed//X0W7ZFTXwn0
+Top1000,again,https://www.youtube.com/embed//YEz-iyZ0kL0
+Top1000,against,https://www.youtube.com/embed//Oi6KM2rmbq4
+Top1000,age,https://www.youtube.com/embed//OdbZkZ0H0q4
+Top1000,agency,https://www.youtube.com/embed//KiSlt9sLcpw
+Top1000,agent,https://www.youtube.com/embed//VzZtMX_-yd0
+Top1000,ago,https://www.youtube.com/embed//YwOSUpJ6FmE
+Top1000,agree,https://www.youtube.com/embed//mfgzZNvZo9w
+Top1000,agreement,https://www.youtube.com/embed//mfgzZNvZo9w
+Top1000,ahead,https://www.youtube.com/embed//7Z1WMbq2Y6E
+Top1000,air,https://www.youtube.com/embed//8ph7VsLt1x0
+Top1000,all,https://www.youtube.com/embed//0DgYClc0e-E
+Top1000,allow,https://www.youtube.com/embed//TuvUnPJOLQI
+Top1000,almost,https://www.youtube.com/embed//lSLPqu_vm-k
+Top1000,alone,https://www.youtube.com/embed//gSOp3W9ZqRk
+Top1000,along,https://www.youtube.com/embed//C7oTL0Mu5J4
+Top1000,already,https://www.youtube.com/embed//8bCNKNO17nQ
+Top1000,also,https://www.youtube.com/embed//1N4DfFk01h8
+Top1000,always,https://www.youtube.com/embed//byJAh12NbRM
+Top1000,American,https://www.youtube.com/embed//lmIYs4PRy8Q
+Top1000,among,https://www.youtube.com/embed//L5Oms2AN3-U
+Top1000,amount,https://www.youtube.com/embed//8KQB5iZCuN8
+Top1000,analysis,https://www.youtube.com/embed//5OZB_aHL0Ug
+Top1000,and,https://www.youtube.com/embed//O5wvGmVozmw
+Top1000,animal,https://www.youtube.com/embed//IyMuDawJZu0
+Top1000,another,https://www.youtube.com/embed//1LOt-sU8c60
+Top1000,answer,https://www.youtube.com/embed//LjkLVzAtHyQ
+Top1000,any,https://www.youtube.com/embed//wEllyA0JhDI
+Top1000,anyone,https://www.youtube.com/embed//kaXeey4OqAQ
+Top1000,anything,https://www.youtube.com/embed//mdmm87aC3ww
+Top1000,appear,https://www.youtube.com/embed//KJ8AWm8qvbE
+Top1000,apply,https://www.youtube.com/embed//OXj3eFSxx9g
+Top1000,approach,https://www.youtube.com/embed//DbzTzrmVb3Q
+Top1000,area,https://www.youtube.com/embed//UgT-5I1krfk
+Top1000,argue,https://www.youtube.com/embed//ydnYnugXZa4
+Top1000,arm,https://www.youtube.com/embed//_b6xEdx9YcU
+Top1000,around,https://www.youtube.com/embed//Jey-96FCFQQ
+Top1000,arrive,https://www.youtube.com/embed//kgsXlwRNM6c
+Top1000,art,https://www.youtube.com/embed//x4SqnfZYRyc
+Top1000,article,https://www.youtube.com/embed//qrlFqLaaJSs
+Top1000,artist,https://www.youtube.com/embed//jORXCych9Q4
+Top1000,as,https://www.youtube.com/embed//LUThceuGTJ8
+Top1000,ask,https://www.youtube.com/embed//o2_DYu4TWcQ
+Top1000,assume,https://www.youtube.com/embed//B5oB0HgAxVo
+Top1000,at,https://www.youtube.com/embed//sh1LBgeZNnM
+Top1000,attack,https://www.youtube.com/embed//ZdVZECH-0fI
+Top1000,attention,https://www.youtube.com/embed//kdT5GasyLbQ
+Top1000,attorney,https://www.youtube.com/embed//HiXttg6T8DA
+Top1000,audience,https://www.youtube.com/embed//xJgSeKFtLQA
+Top1000,author,https://www.youtube.com/embed//upUoC-sDo8U
+Top1000,authority,https://www.youtube.com/embed//_D7vy5_cqs0
+Top1000,available,https://www.youtube.com/embed//PxKpaqPygRQ
+Top1000,avoid,https://www.youtube.com/embed//VmmkI3r_JGk
+Top1000,away,https://www.youtube.com/embed//ciD8-Y_rEZA
+Top1000,baby,https://www.youtube.com/embed//ljYpx7ee9zg
+Top1000,back,https://www.youtube.com/embed//qp7gCgcExlA
+Top1000,bad,https://www.youtube.com/embed//prwtXZ1o2As
+Top1000,bag,https://www.youtube.com/embed//8Y83mMqnOi8
+Top1000,ball,https://www.youtube.com/embed//vnmpdsQdbFc
+Top1000,bank,https://www.youtube.com/embed//AHYA_3qvZnM
+Top1000,bar,https://www.youtube.com/embed//9Zli7o-T3CU
+Top1000,base,https://www.youtube.com/embed//spqSULYFquQ
+Top1000,be,https://www.youtube.com/embed//IUsxS-np-sE
+Top1000,beat,https://www.youtube.com/embed//_betaUws0n8
+Top1000,beautiful,https://www.youtube.com/embed//ryru2O9bWYI
+Top1000,because,https://www.youtube.com/embed//y-VBTZIkHTI
+Top1000,become,https://www.youtube.com/embed//DRNfos2hEbo
+Top1000,bed,https://www.youtube.com/embed//6lQwfs5E7lM
+Top1000,before,https://www.youtube.com/embed//PeO4kaKvoVM
+Top1000,begin,https://www.youtube.com/embed//wFuWmTNw4SE
+Top1000,behavior,https://www.youtube.com/embed//3vfre-a_vI0
+Top1000,behind,https://www.youtube.com/embed//VoetY5cF1Oo
+Top1000,believe,https://www.youtube.com/embed//XVEPT0LvK7Y
+Top1000,benefit,https://www.youtube.com/embed//G1k7oSxaExQ
+Top1000,best,https://www.youtube.com/embed//j43an2ZF830
+Top1000,better,https://www.youtube.com/embed//0G80qJqwweI
+Top1000,between,https://www.youtube.com/embed//F_te6tLlAhw
+Top1000,beyond,https://www.youtube.com/embed//UqMIcjYABZY
+Top1000,big,https://www.youtube.com/embed//4TjIP1OIvkU
+Top1000,bill,https://www.youtube.com/embed//Ckgt9JH2o8c
+Top1000,billion,https://www.youtube.com/embed//Fik4L8t4_vw
+Top1000,bit,https://www.youtube.com/embed//Jfwm2O9A7vk
+Top1000,black,https://www.youtube.com/embed//O5_4x8p5t4U
+Top1000,blood,https://www.youtube.com/embed//Uf2L8U3pdLM
+Top1000,blue,https://www.youtube.com/embed//t2T1_LMVTp8
+Top1000,board,https://www.youtube.com/embed//BjES4tM65hw
+Top1000,body,https://www.youtube.com/embed//9pcnTjM77rE
+Top1000,book,https://www.youtube.com/embed//Kwvw-K6GYW8
+Top1000,born,https://www.youtube.com/embed//GzafTsvZbD0
+Top1000,both,https://www.youtube.com/embed//9yoJHvDfj-4
+Top1000,box,https://www.youtube.com/embed//ha93exTtXtc
+Top1000,boy,https://www.youtube.com/embed//5H6OSAy-Mzs
+Top1000,break,https://www.youtube.com/embed//mmtIOLDEkbw
+Top1000,bring,https://www.youtube.com/embed//Sm94OknTMI8
+Top1000,brother,https://www.youtube.com/embed//G0fzmn3pQng
+Top1000,budget,https://www.youtube.com/embed//N_7sbvI2Y5s
+Top1000,build,https://www.youtube.com/embed//ghLA23_U1MQ
+Top1000,building,https://www.youtube.com/embed//llDkALuyoKo
+Top1000,business,https://www.youtube.com/embed//jl0R9L3EgPU
+Top1000,but,https://www.youtube.com/embed//l3pElzy2Png
+Top1000,buy,https://www.youtube.com/embed//wEPDfmy2M8w
+Top1000,by,https://www.youtube.com/embed//HG950b4hQlg
+Top1000,call,https://www.youtube.com/embed//GSaxmlFiC2s
+Top1000,camera,https://www.youtube.com/embed//9NOTPgKtmsg
+Top1000,campaign,https://www.youtube.com/embed//U7LTVaJ5O2w
+Top1000,can,https://www.youtube.com/embed//BVypOVtFnNk
+Top1000,cancer,https://www.youtube.com/embed//meKZ_h0VhDU
+Top1000,candidate,https://www.youtube.com/embed//wxtuVlan9rg
+Top1000,car,https://www.youtube.com/embed//KnZRyc5aYO0
+Top1000,card,https://www.youtube.com/embed//R21j8UqGNjo
+Top1000,care,https://www.youtube.com/embed//YTtX1te20w0
+Top1000,career,https://www.youtube.com/embed//-1m7X79Eoog
+Top1000,case,https://www.youtube.com/embed//qKhS11n3tqI
+Top1000,catch,https://www.youtube.com/embed//P0g3SiRW__4
+Top1000,cause,https://www.youtube.com/embed//F4a8WUC1YtM
+Top1000,cell,https://www.youtube.com/embed//xghAhNQbK40
+Top1000,center,https://www.youtube.com/embed//9xbR8Yk9vXg
+Top1000,central,https://www.youtube.com/embed//V8gi7Zw_jIU
+Top1000,century,https://www.youtube.com/embed//GZq65xRFiiA
+Top1000,certain,https://www.youtube.com/embed//AMuCePp_2gM
+Top1000,certainly,https://www.youtube.com/embed//tJCmCymPZ2o
+Top1000,chair,https://www.youtube.com/embed//xNrwgoCz9SU
+Top1000,challenge,https://www.youtube.com/embed//j-PKWHMz2Ok
+Top1000,chance,https://www.youtube.com/embed//w8jjz_R6GaI
+Top1000,change,https://www.youtube.com/embed//fo-KE0CPy20
+Top1000,character,https://www.youtube.com/embed//vH8LvIeFNGc
+Top1000,charge,https://www.youtube.com/embed//K5F6N790_-k
+Top1000,check,https://www.youtube.com/embed//v-pa2sZr1a8
+Top1000,child,https://www.youtube.com/embed//32hgy9NSs7k
+Top1000,choice,https://www.youtube.com/embed//e4YCKEFcVdU
+Top1000,choose,https://www.youtube.com/embed//e4YCKEFcVdU
+Top1000,church,https://www.youtube.com/embed//MrQpEWyELqo
+Top1000,citizen,https://www.youtube.com/embed//G2iHHj-jTh8
+Top1000,city,https://www.youtube.com/embed//e7Tz3OSQBQQ
+Top1000,claim,https://www.youtube.com/embed//okzqpijbmMk
+Top1000,class,https://www.youtube.com/embed//zYsmQgZRW0g
+Top1000,clear,https://www.youtube.com/embed//uy5eMROgDM4
+Top1000,clearly,https://www.youtube.com/embed//uKSJnAaaXBE
+Top1000,close,https://www.youtube.com/embed//kCiFi6IQpBE
+Top1000,coach,https://www.youtube.com/embed//7n-K0WmjigM
+Top1000,cold,https://www.youtube.com/embed//9bLENg2AXrY
+Top1000,collection,https://www.youtube.com/embed//VqvKAB_ki1U
+Top1000,college,https://www.youtube.com/embed//G0IHRXJ8VVY
+Top1000,color,https://www.youtube.com/embed//R0MW-QKaqeQ
+Top1000,come,https://www.youtube.com/embed//rjFNUKnX_7o
+Top1000,common,https://www.youtube.com/embed//qBqUSO7bMZk
+Top1000,community,https://www.youtube.com/embed//YfXV2fzn7dk
+Top1000,company,https://www.youtube.com/embed//HhFub08UPjM
+Top1000,compare,https://www.youtube.com/embed//4OqSADr7ZtY
+Top1000,computer,https://www.youtube.com/embed//fY11M3Dxxx0
+Top1000,concern,https://www.youtube.com/embed//zQ9h9rQ_iU4
+Top1000,condition,https://www.youtube.com/embed//fa80-iqRqIE
+Top1000,conference,https://www.youtube.com/embed//FMPXnAryzkE
+Top1000,Congress,https://www.youtube.com/embed//mdv3ccyctho
+Top1000,consumer,https://www.youtube.com/embed//TZt62Hsc0AI
+Top1000,contain,https://www.youtube.com/embed//Pd4DnXzegKc
+Top1000,continue,https://www.youtube.com/embed//nVC-Fy1HCKs
+Top1000,control,https://www.youtube.com/embed//_c1W5VPKYc8
+Top1000,cost,https://www.youtube.com/embed//lxMBjE6rjEA
+Top1000,could,https://www.youtube.com/embed//cEYNUekCC58
+Top1000,country,https://www.youtube.com/embed//YgCmE5kljQw
+Top1000,couple,https://www.youtube.com/embed//zYc7JHABcwg
+Top1000,course,https://www.youtube.com/embed//-JZcjcOFjUM
+Top1000,court,https://www.youtube.com/embed//9Cv5cWKOHCA
+Top1000,cover,https://www.youtube.com/embed//YcTb593p3y4
+Top1000,create,https://www.youtube.com/embed//hQgjfveYbxI
+Top1000,cultural,https://www.youtube.com/embed//DTdJJWpBBP8
+Top1000,culture,https://www.youtube.com/embed//onk66POk4xU
+Top1000,cup,https://www.youtube.com/embed//FJUthNBxeKE
+Top1000,current,https://www.youtube.com/embed//HlIrTXM5Kx4
+Top1000,customer,https://www.youtube.com/embed//oXTH1sisDGA
+Top1000,cut,https://www.youtube.com/embed//C_n0oiY9iQQ
+Top1000,dark,https://www.youtube.com/embed//CGLQEeEzo1s
+Top1000,data,https://www.youtube.com/embed//3ToatFqOlUM
+Top1000,daughter,https://www.youtube.com/embed//hJD5uIn7ZHg
+Top1000,day,https://www.youtube.com/embed//m9HnzIN_O8Y
+Top1000,dead,https://www.youtube.com/embed//mjdSWHryve4
+Top1000,deal,https://www.youtube.com/embed//GusZGlITo-4
+Top1000,death,https://www.youtube.com/embed//2bC-qEww9w8
+Top1000,decade,https://www.youtube.com/embed//Ses7bbNveec
+Top1000,decide,https://www.youtube.com/embed//N0969RhLMp0
+Top1000,decision,https://www.youtube.com/embed//gyWG1p2t3zc
+Top1000,deep,https://www.youtube.com/embed//0vcF3e4c4nc
+Top1000,degree,https://www.youtube.com/embed//YhI59X_25t8
+Top1000,Democrat,https://www.youtube.com/embed//VZgRWrNukss
+Top1000,democratic,https://www.youtube.com/embed//dFjx3cwV8SM
+Top1000,describe,https://www.youtube.com/embed//DX0BM9zZrEg
+Top1000,design,https://www.youtube.com/embed//DVL2qvUfhKY
+Top1000,despite,https://www.youtube.com/embed//bDWuP-_xEq8
+Top1000,determine,https://www.youtube.com/embed//r8gvnE0liOg
+Top1000,develop,https://www.youtube.com/embed//Ya9stWQyt6A
+Top1000,development,https://www.youtube.com/embed//jeN0XCeFXes
+Top1000,die,https://www.youtube.com/embed//2bC-qEww9w8
+Top1000,different,https://www.youtube.com/embed//EunD6JXshgY
+Top1000,difficult,https://www.youtube.com/embed//QjJaVqSuDo8
+Top1000,dinner,https://www.youtube.com/embed//X7UPEOYKzZs
+Top1000,direction,https://www.youtube.com/embed//JtpNUhhzqn0
+Top1000,director,https://www.youtube.com/embed//gTifhqJ_fKk
+Top1000,discover,https://www.youtube.com/embed//mHN-4ZDYGIM
+Top1000,discuss,https://www.youtube.com/embed//V92uL0D6dI4
+Top1000,discussion,https://www.youtube.com/embed//V92uL0D6dI4
+Top1000,disease,https://www.youtube.com/embed//ksiDNmyqL0M
+Top1000,do,https://www.youtube.com/embed//VSShe4lfYR4
+Top1000,doctor,https://www.youtube.com/embed//IEVgcJA3JWk
+Top1000,dog,https://www.youtube.com/embed//IbpJtH_QssM
+Top1000,door,https://www.youtube.com/embed//xzIU5tmBrLc
+Top1000,down,https://www.youtube.com/embed//TAJDFITIbUk
+Top1000,draw,https://www.youtube.com/embed//ua6jgiWYZPw
+Top1000,dream,https://www.youtube.com/embed//PQ6tYj9tCQs
+Top1000,drive,https://www.youtube.com/embed//YfwGL0ZIBqE
+Top1000,drop,https://www.youtube.com/embed//Ui097a43wo8
+Top1000,drug,https://www.youtube.com/embed//tSXyRmrWma0
+Top1000,during,https://www.youtube.com/embed//fNCSWnHOCgI
+Top1000,each,https://www.youtube.com/embed//EE8SbEdpQ3A
+Top1000,early,https://www.youtube.com/embed//RSAwb_vK4hI
+Top1000,east,https://www.youtube.com/embed//tGKOaKI-CLE
+Top1000,easy,https://www.youtube.com/embed//k5RKXRKYCrM
+Top1000,eat,https://www.youtube.com/embed//OmylSinUxns
+Top1000,economic,https://www.youtube.com/embed//rKJQY3kdZa8
+Top1000,economy,https://www.youtube.com/embed//MOdpmPBfI0M
+Top1000,edge,https://www.youtube.com/embed//JonrjmsQBaI
+Top1000,education,https://www.youtube.com/embed//SxP4S_KFKF4
+Top1000,effect,https://www.youtube.com/embed//jlYA-ve5hOs
+Top1000,effort,https://www.youtube.com/embed//DAzFt7BsXPM
+Top1000,eight,https://www.youtube.com/embed//ZdZco8j2BNo
+Top1000,either,https://www.youtube.com/embed//uLoKdhE7rYU
+Top1000,election,https://www.youtube.com/embed//dLp5fTF-Fts
+Top1000,else,https://www.youtube.com/embed//8E2rsAQN9Hc
+Top1000,employee,https://www.youtube.com/embed//akaN6CRjpt0
+Top1000,end,https://www.youtube.com/embed//SiRvPUToJvw
+Top1000,energy,https://www.youtube.com/embed//YYcyRlI1OWU
+Top1000,enjoy,https://www.youtube.com/embed//TLOVF1E-Xrw
+Top1000,enough,https://www.youtube.com/embed//XVgP90cND4M
+Top1000,enter,https://www.youtube.com/embed//x9nC_9QylBA
+Top1000,entire,https://www.youtube.com/embed//mvYXfbKFrDQ
+Top1000,environment,https://www.youtube.com/embed//Ca7uTAoMuPc
+Top1000,environmental,https://www.youtube.com/embed//d-3DdRqKxhU
+Top1000,especially,https://www.youtube.com/embed//oXwYWzbShlA
+Top1000,establish,https://www.youtube.com/embed//cnsLh4Vdcik
+Top1000,even,https://www.youtube.com/embed//kCIf5T08orU
+Top1000,evening,https://www.youtube.com/embed//T6HMmaPxBL8
+Top1000,event,https://www.youtube.com/embed//Qi0fDvADXRQ
+Top1000,ever,https://www.youtube.com/embed//Kb_R2f_NDKc
+Top1000,every,https://www.youtube.com/embed//nYuM6Vz4ApQ
+Top1000,everybody,https://www.youtube.com/embed//V36_od_l5mU
+Top1000,everyone,https://www.youtube.com/embed//V36_od_l5mU
+Top1000,everything,https://www.youtube.com/embed//dVXgo4HsNpY
+Top1000,evidence,https://www.youtube.com/embed//Krd8vOPcFZA
+Top1000,exactly,https://www.youtube.com/embed//5_pl6sxrrW0
+Top1000,example,https://www.youtube.com/embed//DnIb38DHk30
+Top1000,executive,https://www.youtube.com/embed//Sfc4SSZrlCc
+Top1000,exist,https://www.youtube.com/embed//8ABNk9pzVOc
+Top1000,expect,https://www.youtube.com/embed//YMmryqyChUE
+Top1000,experience,https://www.youtube.com/embed//m03M4FcaC9Q
+Top1000,expert,https://www.youtube.com/embed//RH1hfuGDFJ0
+Top1000,explain,https://www.youtube.com/embed//yDuSp4eYPBw
+Top1000,eye,https://www.youtube.com/embed//qBzpxhtAjOw
+Top1000,face,https://www.youtube.com/embed//vToOzx3lsVQ
+Top1000,fact,https://www.youtube.com/embed//zmKXTw_1ELY
+Top1000,factor,https://www.youtube.com/embed//1KUrZGWMuIw
+Top1000,fail,https://www.youtube.com/embed//9MI8ABNJepc
+Top1000,fall,https://www.youtube.com/embed//-f8VFRHM5TE
+Top1000,family,https://www.youtube.com/embed//zEP7lFuRjC0
+Top1000,far,https://www.youtube.com/embed//zVJ7-WuHsow
+Top1000,fast,https://www.youtube.com/embed//Zkp9QaiusDA
+Top1000,father,https://www.youtube.com/embed//UnAiMqWCzNs
+Top1000,fear,https://www.youtube.com/embed//N-2pFw6Jw-s
+Top1000,federal,https://www.youtube.com/embed//62oEAbCAX9E
+Top1000,feel,https://www.youtube.com/embed//UxO5Q0fSqOw
+Top1000,feeling,https://www.youtube.com/embed//7R_aiqAu3Ys
+Top1000,few,https://www.youtube.com/embed//SduOhUwKYSc
+Top1000,field,https://www.youtube.com/embed//XqIgUWdBxz8
+Top1000,fight,https://www.youtube.com/embed//sduX9T02b_M
+Top1000,figure,https://www.youtube.com/embed//xmAcKkPWGUE
+Top1000,fill,https://www.youtube.com/embed//7D6nhnhEGCg
+Top1000,film,https://www.youtube.com/embed//fd4AY10rclE
+Top1000,final,https://www.youtube.com/embed//n5rMf-z3Qmc
+Top1000,finally,https://www.youtube.com/embed//5ZWUphhoxLU
+Top1000,financial,https://www.youtube.com/embed//mwJ4Yvk7uSo
+Top1000,find,https://www.youtube.com/embed//2O5wVw-rlIs
+Top1000,fine,https://www.youtube.com/embed//OHHKerxHJjQ
+Top1000,finger,https://www.youtube.com/embed//OMOwxJoS8wA
+Top1000,finish,https://www.youtube.com/embed//gYB8ji01BLo
+Top1000,fire,https://www.youtube.com/embed//QGhg-pnb8t8
+Top1000,firm,https://www.youtube.com/embed//id5Y7IusyW8
+Top1000,first,https://www.youtube.com/embed//x9xgoFqsBkE
+Top1000,fish,https://www.youtube.com/embed//IJyUcYJMpmU
+Top1000,five,https://www.youtube.com/embed//7rhyjZEpqVw
+Top1000,floor,https://www.youtube.com/embed//ITtL6y_Lt14
+Top1000,fly,https://www.youtube.com/embed//u1pDng38AxE
+Top1000,focus,https://www.youtube.com/embed//TGaN5G4iZR0
+Top1000,follow,https://www.youtube.com/embed//6ywnNz3BaMk
+Top1000,food,https://www.youtube.com/embed//IR9bbRSVp7U
+Top1000,foot,https://www.youtube.com/embed//cZi5jZ_fpRQ
+Top1000,for,https://www.youtube.com/embed//xAhjtGNnQVk
+Top1000,force,https://www.youtube.com/embed//ksh9LMmwyPM
+Top1000,foreign,https://www.youtube.com/embed//seKiOd6TxLw
+Top1000,forget,https://www.youtube.com/embed//N18WPFcphhs
+Top1000,form,https://www.youtube.com/embed//_qOJ7eyx7GU
+Top1000,former,https://www.youtube.com/embed//RggZFyIO1Wg
+Top1000,forward,https://www.youtube.com/embed//VOKBPtH_MRg
+Top1000,four,https://www.youtube.com/embed//U4nGO5blOnQ
+Top1000,free,https://www.youtube.com/embed//_OvXfc8_Ffo
+Top1000,friend,https://www.youtube.com/embed//6RRmIyhkMx0
+Top1000,from,https://www.youtube.com/embed//7OEW40vhX68
+Top1000,front,https://www.youtube.com/embed//8H5YOwSmhDk
+Top1000,full,https://www.youtube.com/embed//9l0svQl0Pmk
+Top1000,fund,https://www.youtube.com/embed//K1aFqgmXXlU
+Top1000,future,https://www.youtube.com/embed//B-kwpcsoI6o
+Top1000,game,https://www.youtube.com/embed//17gZsl0jClE
+Top1000,garden,https://www.youtube.com/embed//5h69GQntuhw
+Top1000,gas,https://www.youtube.com/embed//MuTK23w5kHQ
+Top1000,general,https://www.youtube.com/embed//Qfn0Tl2caZc
+Top1000,generation,https://www.youtube.com/embed//Tx4njI_M01I
+Top1000,get,https://www.youtube.com/embed//mZRz-Uyj2fo
+Top1000,girl,https://www.youtube.com/embed//pwh3cOdoiG4
+Top1000,give,https://www.youtube.com/embed//U5p42-d-buw
+Top1000,glass,https://www.youtube.com/embed//9cevulf9sNQ
+Top1000,go,https://www.youtube.com/embed//G4a8k_C92Oc
+Top1000,goal,https://www.youtube.com/embed//8t9-34ZHDAE
+Top1000,good,https://www.youtube.com/embed//UVnyF_Tl1uI
+Top1000,government,https://www.youtube.com/embed//v3vckoSth7Y
+Top1000,great,https://www.youtube.com/embed//X67gLEcynIM
+Top1000,green,https://www.youtube.com/embed//WrkXE5l6udM
+Top1000,ground,https://www.youtube.com/embed//DsPXcX3baJU
+Top1000,group,https://www.youtube.com/embed//78XnsAn9bOc
+Top1000,grow,https://www.youtube.com/embed//Z24DQnf-GDk
+Top1000,growth,https://www.youtube.com/embed//j7TOWgQt8rI
+Top1000,guess,https://www.youtube.com/embed//mNqKyx-Hslg
+Top1000,gun,https://www.youtube.com/embed//2bc39pCOVW8
+Top1000,guy,https://www.youtube.com/embed//7aGov0gaoeM
+Top1000,hair,https://www.youtube.com/embed//ScxPUBwNP80
+Top1000,half,https://www.youtube.com/embed//AMUwXTGlLdM
+Top1000,hand,https://www.youtube.com/embed//c-fqsuYWFUg
+Top1000,hang,https://www.youtube.com/embed//QfDE3Dttels
+Top1000,happen,https://www.youtube.com/embed//ICZDQWUhc04
+Top1000,happy,https://www.youtube.com/embed//ZXHHO_DY6_A
+Top1000,hard,https://www.youtube.com/embed//RgGjl2y6dkM
+Top1000,have,https://www.youtube.com/embed//Tg44F2vYVY4
+Top1000,he,https://www.youtube.com/embed//IQOg8cLZtmo
+Top1000,head,https://www.youtube.com/embed//9HK6J9Hbt8o
+Top1000,health,https://www.youtube.com/embed//6Omh0Fy0yoA
+Top1000,hear,https://www.youtube.com/embed//CPAxecqxhzY
+Top1000,heart,https://www.youtube.com/embed//lPP5FVC08n4
+Top1000,heat,https://www.youtube.com/embed//tLPfnum9rkk
+Top1000,heavy,https://www.youtube.com/embed//p8m9-RMJ-8Y
+Top1000,help,https://www.youtube.com/embed//sdeo6oIoWFU
+Top1000,her,https://www.youtube.com/embed//sCiih2XymOE
+Top1000,here,https://www.youtube.com/embed//2dALbgMQWmk
+Top1000,herself,https://www.youtube.com/embed//irkCXkMziNk
+Top1000,high,https://www.youtube.com/embed//GwOuxP6lSuE
+Top1000,him,https://www.youtube.com/embed//Yb6nqKXG7do
+Top1000,himself,https://www.youtube.com/embed//SQfpUqYb6h4
+Top1000,his,https://www.youtube.com/embed//_oG-AspyK70
+Top1000,history,https://www.youtube.com/embed//GbqkM_RUSqQ
+Top1000,hit,https://www.youtube.com/embed//AbShTNdghBY
+Top1000,hold,https://www.youtube.com/embed//uyy0V5iKm0g
+Top1000,home,https://www.youtube.com/embed//n0Xb58PVX_A
+Top1000,hope,https://www.youtube.com/embed//aOyZk0caisk
+Top1000,hospital,https://www.youtube.com/embed//syueldx2RHQ
+Top1000,hot,https://www.youtube.com/embed//a0robonALIk
+Top1000,hotel,https://www.youtube.com/embed//Zk4KczmTQv4
+Top1000,hour,https://www.youtube.com/embed//G9_9ZNsxKpI
+Top1000,house,https://www.youtube.com/embed//CJMH2YMuC6I
+Top1000,how,https://www.youtube.com/embed//awmySeWaTkk
+Top1000,however,https://www.youtube.com/embed//vXsY-KNI3H4
+Top1000,huge,https://www.youtube.com/embed//-kTqkwSJV_4
+Top1000,human,https://www.youtube.com/embed//ZV--aVD4-UE
+Top1000,hundred,https://www.youtube.com/embed//bfX4euuELh4
+Top1000,husband,https://www.youtube.com/embed//TYTsqVZU1dk
+Top1000,I,https://www.youtube.com/embed//cL1qV6q8SMs
+Top1000,idea,https://www.youtube.com/embed//mM752iAos2w
+Top1000,identify,https://www.youtube.com/embed//HLh7f-zTEkg
+Top1000,if,https://www.youtube.com/embed//M8CXHkOskvo
+Top1000,image,https://www.youtube.com/embed//9WvnIZH6T7s
+Top1000,imagine,https://www.youtube.com/embed//P9R-1tudRKY
+Top1000,impact,https://www.youtube.com/embed//cXXbWqdcjS0
+Top1000,important,https://www.youtube.com/embed//2NEoRZDobDs
+Top1000,improve,https://www.youtube.com/embed//1ZI5ua7TMh4
+Top1000,in,https://www.youtube.com/embed//YirRi12-zWo
+Top1000,include,https://www.youtube.com/embed//zvs4g_NE2pc
+Top1000,including,https://www.youtube.com/embed//irw0klLsk48
+Top1000,increase,https://www.youtube.com/embed//D96nyDctWVA
+Top1000,indeed,https://www.youtube.com/embed//sO_qbmDLOzI
+Top1000,indicate,https://www.youtube.com/embed//cSQRI0izdl4
+Top1000,individual,https://www.youtube.com/embed//aoIxLV6YZhE
+Top1000,industry,https://www.youtube.com/embed//oECvEAqFqHc
+Top1000,information,https://www.youtube.com/embed//j9sDnjH6aAQ
+Top1000,inside,https://www.youtube.com/embed//nXrGgnaQ-LY
+Top1000,instead,https://www.youtube.com/embed//vh01cF7QsUw
+Top1000,institution,https://www.youtube.com/embed//80xJCVgxu6E
+Top1000,interest,https://www.youtube.com/embed//AmQT3MjOtU0
+Top1000,interesting,https://www.youtube.com/embed//sTtHlQeVESg
+Top1000,international,https://www.youtube.com/embed//EzrPDTQt8Oo
+Top1000,interview,https://www.youtube.com/embed//wCUmfORhzBI
+Top1000,into,https://www.youtube.com/embed//vas2JFRToFg
+Top1000,investment,https://www.youtube.com/embed//bselzczLtqI
+Top1000,involve,https://www.youtube.com/embed//jw2_O4Teli4
+Top1000,issue,https://www.youtube.com/embed//dg597aGX-os
+Top1000,it,https://www.youtube.com/embed//BjKwwPbQiCs
+Top1000,item,https://www.youtube.com/embed//2qXQdHYQaK8
+Top1000,its,https://www.youtube.com/embed//pRcXObfwfq4
+Top1000,itself,https://www.youtube.com/embed//RiypOflHvXQ
+Top1000,job,https://www.youtube.com/embed//42A3aALiSng
+Top1000,join,https://www.youtube.com/embed//_6zNbCmnPyo
+Top1000,just,https://www.youtube.com/embed//rCnBtHadj9I
+Top1000,keep,https://www.youtube.com/embed//e8ou8_mZFBA
+Top1000,key,https://www.youtube.com/embed//fVzJr5q3noE
+Top1000,kid,https://www.youtube.com/embed//UWanxSkX9bo
+Top1000,kill,https://www.youtube.com/embed//cC59C9Vm5ig
+Top1000,kind,https://www.youtube.com/embed//opJpkyVGmbA
+Top1000,kitchen,https://www.youtube.com/embed//-yEO1YL7dSg
+Top1000,know,https://www.youtube.com/embed//Ht2B0VzHFwQ
+Top1000,knowledge,https://www.youtube.com/embed//QlFgphKlWSE
+Top1000,land,https://www.youtube.com/embed//bdvMl7huZlY
+Top1000,language,https://www.youtube.com/embed//O8XiLkrSx48
+Top1000,large,https://www.youtube.com/embed//_0ltTWDlWyo
+Top1000,last,https://www.youtube.com/embed//f8MfjdWKh24
+Top1000,late,https://www.youtube.com/embed//9ul_1z23KLI
+Top1000,later,https://www.youtube.com/embed//4Md8yfrXzp8
+Top1000,laugh,https://www.youtube.com/embed//ehLkCbu_ZnQ
+Top1000,law,https://www.youtube.com/embed//OZy1ugYqyyc
+Top1000,lawyer,https://www.youtube.com/embed//lASXLjrY-u0
+Top1000,lay,https://www.youtube.com/embed//d3E3Eu80Jdc
+Top1000,lead,https://www.youtube.com/embed//amS8WdpuoAM
+Top1000,leader,https://www.youtube.com/embed//EzyCCHzEJDI
+Top1000,learn,https://www.youtube.com/embed//78mzpzvN9tc
+Top1000,least,https://www.youtube.com/embed//2DnBI9xxuho
+Top1000,leave,https://www.youtube.com/embed//fn1PTkU1fGI
+Top1000,left,https://www.youtube.com/embed//tBXh9RPeKlI
+Top1000,leg,https://www.youtube.com/embed//RWWZidE8-60
+Top1000,legal,https://www.youtube.com/embed//PT7mu8zqU1s
+Top1000,less,https://www.youtube.com/embed//4cXuJHTunR0
+Top1000,let,https://www.youtube.com/embed//w705jpxY8m8
+Top1000,letter,https://www.youtube.com/embed//fLkoJvqUUi8
+Top1000,level,https://www.youtube.com/embed//qbU-VS1rS3k
+Top1000,lie,https://www.youtube.com/embed//XkSY0TdkQdM
+Top1000,life,https://www.youtube.com/embed//4LPjUIU4VMg
+Top1000,light,https://www.youtube.com/embed//IcF-D_eJhi0
+Top1000,like,https://www.youtube.com/embed//8uIg8r1awC4
+Top1000,likely,https://www.youtube.com/embed//8uIg8r1awC4
+Top1000,line,https://www.youtube.com/embed//NC7FO-9wz4E
+Top1000,list,https://www.youtube.com/embed//6tmwqlYiflI
+Top1000,listen,https://www.youtube.com/embed//7I76cfbglQE
+Top1000,little,https://www.youtube.com/embed//IVKyMqNLy3k
+Top1000,live,https://www.youtube.com/embed//PsLWbROnT7g
+Top1000,local,https://www.youtube.com/embed//JUGHgwSwKkI
+Top1000,long,https://www.youtube.com/embed//nAGD0JwteGM
+Top1000,look,https://www.youtube.com/embed//JytzcBQp8d4
+Top1000,lose,https://www.youtube.com/embed//hToPKg_N4qY
+Top1000,loss,https://www.youtube.com/embed//hfoQ8XGziz8
+Top1000,lot,https://www.youtube.com/embed//SgXytyNKQWg
+Top1000,love,https://www.youtube.com/embed//lRIRPw5EdSU
+Top1000,low,https://www.youtube.com/embed//wdQWhZxd35A
+Top1000,machine,https://www.youtube.com/embed//y59idlTVHjY
+Top1000,magazine,https://www.youtube.com/embed//JytC15LCiMU
+Top1000,main,https://www.youtube.com/embed//5c10qaBCdpc
+Top1000,major,https://www.youtube.com/embed//atM1DOWoYmQ
+Top1000,majority,https://www.youtube.com/embed//atM1DOWoYmQ
+Top1000,make,https://www.youtube.com/embed//qd25L4BtOcI
+Top1000,man,https://www.youtube.com/embed//rTUmMfWQ2rw
+Top1000,manage,https://www.youtube.com/embed//GYbHeF7kTac
+Top1000,management,https://www.youtube.com/embed//c30AanJbntU
+Top1000,manager,https://www.youtube.com/embed//0ScBo3iRUhY
+Top1000,many,https://www.youtube.com/embed//Ku9SWR4uSUI
+Top1000,market,https://www.youtube.com/embed//H7QvTSD_DZI
+Top1000,marriage,https://www.youtube.com/embed//vc2pxKUnO5o
+Top1000,material,https://www.youtube.com/embed//fDkC8i87iNc
+Top1000,matter,https://www.youtube.com/embed//PW5fu37JpMM
+Top1000,may,https://www.youtube.com/embed//A6EbHii9EAc
+Top1000,maybe,https://www.youtube.com/embed//7bCApb-yubw
+Top1000,me,https://www.youtube.com/embed//l34VkXFxP5U
+Top1000,mean,https://www.youtube.com/embed//1fyYnRdMH5g
+Top1000,measure,https://www.youtube.com/embed//UHSm5zci4h4
+Top1000,media,https://www.youtube.com/embed//x_Bo1TjC--E
+Top1000,medical,https://www.youtube.com/embed//88xSMjuFPHA
+Top1000,meet,https://www.youtube.com/embed//FC1R9kyegJY
+Top1000,meeting,https://www.youtube.com/embed//2Q79H7VpOsA
+Top1000,member,https://www.youtube.com/embed//D0p4WZk2tSE
+Top1000,memory,https://www.youtube.com/embed//yabFLDVcEOM
+Top1000,mention,https://www.youtube.com/embed//1Jbd0o1RWtU
+Top1000,message,https://www.youtube.com/embed//fcUW7PCNdeQ
+Top1000,method,https://www.youtube.com/embed//bAS0ND_npQw
+Top1000,middle,https://www.youtube.com/embed//dV6jdKRJTvc
+Top1000,might,https://www.youtube.com/embed//7bCApb-yubw
+Top1000,military,https://www.youtube.com/embed//in5ZG2pHLdc
+Top1000,million,https://www.youtube.com/embed//mamJxNp4wlE
+Top1000,mind,https://www.youtube.com/embed//zybx4YHEhzQ
+Top1000,minute,https://www.youtube.com/embed//cNyi0VgluXo
+Top1000,miss,https://www.youtube.com/embed//ZT-SHd3kPaA
+Top1000,mission,https://www.youtube.com/embed//fTME05WEuXo
+Top1000,model,https://www.youtube.com/embed//xqG6lTroVvc
+Top1000,moment,https://www.youtube.com/embed//oj4mtG_L2OI
+Top1000,money,https://www.youtube.com/embed//ZMQz2hoT5V4
+Top1000,month,https://www.youtube.com/embed//YLuGuPS6NU8
+Top1000,more,https://www.youtube.com/embed//nJwr-yWRdNQ
+Top1000,morning,https://www.youtube.com/embed//iH8N44QMh7c
+Top1000,most,https://www.youtube.com/embed//Rhu6Yzzp1CE
+Top1000,mother,https://www.youtube.com/embed//qUkCg3rtEws
+Top1000,mouth,https://www.youtube.com/embed//OtK8Jv4U1CE
+Top1000,move,https://www.youtube.com/embed//OxKJDUAYsjg
+Top1000,movement,https://www.youtube.com/embed//mWyfPfAtJCA
+Top1000,movie,https://www.youtube.com/embed//ACBYkV6CDxI
+Top1000,Mr,https://www.youtube.com/embed//IwgWiuFuJI8
+Top1000,much,https://www.youtube.com/embed//ncGliuvNTT8
+Top1000,music,https://www.youtube.com/embed//Ln-bxWDR6Y8
+Top1000,must,https://www.youtube.com/embed//Ti9-UQ7u0fY
+Top1000,my,https://www.youtube.com/embed//IKSfqjBWedg
+Top1000,myself,https://www.youtube.com/embed//TzNk3Yl2tMw
+Top1000,name,https://www.youtube.com/embed//GbeC9TFuSX4
+Top1000,nation,https://www.youtube.com/embed//K7Tmn08PJew
+Top1000,national,https://www.youtube.com/embed//t24gHWhGAuU
+Top1000,natural,https://www.youtube.com/embed//eiqLQnq2JkA
+Top1000,nature,https://www.youtube.com/embed//DdRWIi_LqSc
+Top1000,near,https://www.youtube.com/embed//Y76p2KFlYU0
+Top1000,nearly,https://www.youtube.com/embed//ZvW1ocG6Hwo
+Top1000,need,https://www.youtube.com/embed//7py1g9DyMcI
+Top1000,network,https://www.youtube.com/embed//ZBFMtVgq1UU
+Top1000,never,https://www.youtube.com/embed//ew7FIPLu5SE
+Top1000,new,https://www.youtube.com/embed//cftJMIT87TQ
+Top1000,news,https://www.youtube.com/embed//4sgWiHiK97Y
+Top1000,newspaper,https://www.youtube.com/embed//Or8gNPdOsr4
+Top1000,next,https://www.youtube.com/embed//U9LJw1dsPkM
+Top1000,nice,https://www.youtube.com/embed//2PeTh4Ym048
+Top1000,night,https://www.youtube.com/embed//hDcREO5I4Ps
+Top1000,no,https://www.youtube.com/embed//QJXKaOSyl4o
+Top1000,none,https://www.youtube.com/embed//yOq40lDCkcM
+Top1000,nor,https://www.youtube.com/embed//pB9FKEh5sts
+Top1000,north,https://www.youtube.com/embed//pB9FKEh5sts
+Top1000,not,https://www.youtube.com/embed//pUn7pNE5HEE
+Top1000,note,https://www.youtube.com/embed//5d1aWw61JVI
+Top1000,nothing,https://www.youtube.com/embed//xteXTant-Ww
+Top1000,notice,https://www.youtube.com/embed//su0Hg7jFJ0g
+Top1000,now,https://www.youtube.com/embed//OdOx4qaYlKI
+Top1000,number,https://www.youtube.com/embed//ClNyMzf07dQ
+Top1000,occur,https://www.youtube.com/embed//3Fib25b3epw
+Top1000,off,https://www.youtube.com/embed//WQW3tvvoUoM
+Top1000,offer,https://www.youtube.com/embed//tU7IElFdVkI
+Top1000,office,https://www.youtube.com/embed//X0Qe7jHMtmg
+Top1000,officer,https://www.youtube.com/embed//X0Qe7jHMtmg
+Top1000,official,https://www.youtube.com/embed//6n5cPKfNBwM
+Top1000,often,https://www.youtube.com/embed//4dtwTr_w12I
+Top1000,oh,https://www.youtube.com/embed//QHnpBxY9TqY
+Top1000,oil,https://www.youtube.com/embed//cTXHA1SZO7A
+Top1000,ok,https://www.youtube.com/embed//qSIBZEk8FG0
+Top1000,old,https://www.youtube.com/embed//wmJfQSUsnQ8
+Top1000,on,https://www.youtube.com/embed//e8hiRj3xDiw
+Top1000,once,https://www.youtube.com/embed//mCeATJ3-gKA
+Top1000,one,https://www.youtube.com/embed//Gys7eD0u1AQ
+Top1000,only,https://www.youtube.com/embed//_QPZmDzEDJw
+Top1000,onto,https://www.youtube.com/embed//WlmxA_7SlYM
+Top1000,open,https://www.youtube.com/embed//LEWPXaskrJk
+Top1000,operation,https://www.youtube.com/embed//ODZj7co4JuU
+Top1000,opportunity,https://www.youtube.com/embed//fGc8W48EpCk
+Top1000,option,https://www.youtube.com/embed//JhhS-j5gZ44
+Top1000,or,https://www.youtube.com/embed//6cB9xVBOasE
+Top1000,order,https://www.youtube.com/embed//AK7hYoGot7M
+Top1000,organization,https://www.youtube.com/embed//R96mYn7q850
+Top1000,other,https://www.youtube.com/embed//qaf07PAGW6w
+Top1000,others,https://www.youtube.com/embed//oyDxTpVhCpQ
+Top1000,our,https://www.youtube.com/embed//R18_nX7sp7M
+Top1000,out,https://www.youtube.com/embed//8nXYckjMG2Q
+Top1000,outside,https://www.youtube.com/embed//QypzczNx0iY
+Top1000,over,https://www.youtube.com/embed//bFvC_W5OrCg
+Top1000,own,https://www.youtube.com/embed//FNGOksJNyF8
+Top1000,owner,https://www.youtube.com/embed//-CDjuGxfluU
+Top1000,page,https://www.youtube.com/embed//XOhKB7tH58c
+Top1000,pain,https://www.youtube.com/embed//LfX1mkqwU7w
+Top1000,painting,https://www.youtube.com/embed//9V_pXf6tP_U
+Top1000,paper,https://www.youtube.com/embed//Zg7-DM25KIM
+Top1000,parent,https://www.youtube.com/embed//PSRsU7h4iLw
+Top1000,part,https://www.youtube.com/embed//gzZW38HayEk
+Top1000,participant,https://www.youtube.com/embed//ZJaXiQj1LDU
+Top1000,particular,https://www.youtube.com/embed//yayHN_bqk6w
+Top1000,particularly,https://www.youtube.com/embed//A4fCeMeig5g
+Top1000,partner,https://www.youtube.com/embed//ei9kkjtIt6w
+Top1000,party,https://www.youtube.com/embed//FGiQuEgK2s0
+Top1000,pass,https://www.youtube.com/embed//xmF9u8UBJAQ
+Top1000,past,https://www.youtube.com/embed//L2x7sOguFg0
+Top1000,patient,https://www.youtube.com/embed//GpwqfknHObE
+Top1000,pattern,https://www.youtube.com/embed//2OiR1Ho3FGI
+Top1000,pay,https://www.youtube.com/embed//-hG1-JxM5Vw
+Top1000,peace,https://www.youtube.com/embed//nTCia_6uK4A
+Top1000,people,https://www.youtube.com/embed//ygbLqAottqE
+Top1000,per,https://www.youtube.com/embed//9s-DAB45OZc
+Top1000,perform,https://www.youtube.com/embed//OAuXHQP5hrs
+Top1000,performance,https://www.youtube.com/embed//cjwotdymkus
+Top1000,perhaps,https://www.youtube.com/embed//48DWq45h_Tk
+Top1000,period,https://www.youtube.com/embed//dQiSaYUurgY
+Top1000,person,https://www.youtube.com/embed//RXX7T4-saPs
+Top1000,personal,https://www.youtube.com/embed//K9m1pAFMqyw
+Top1000,phone,https://www.youtube.com/embed//fgg7qxjYh_0
+Top1000,physical,https://www.youtube.com/embed//t7BzWCKuGIQ
+Top1000,pick,https://www.youtube.com/embed//6IoSRSYGT3k
+Top1000,picture,https://www.youtube.com/embed//1B4PN632jHI
+Top1000,piece,https://www.youtube.com/embed//QcdoYs6bLes
+Top1000,place,https://www.youtube.com/embed//Ka8vriGAuWY
+Top1000,plan,https://www.youtube.com/embed//uOwG3ZEN-IE
+Top1000,plant,https://www.youtube.com/embed//BzW5Uy29n8c
+Top1000,play,https://www.youtube.com/embed//ODByBNyosxc
+Top1000,player,https://www.youtube.com/embed//4RrLQxKFJx8
+Top1000,PM,https://www.youtube.com/embed//3cdkvRyKtgU
+Top1000,point,https://www.youtube.com/embed//D13LEr6dWNY
+Top1000,police,https://www.youtube.com/embed//aPcjl3P94xc
+Top1000,policy,https://www.youtube.com/embed//1GPAokKW_wA
+Top1000,political,https://www.youtube.com/embed//5VdgEOUO7uU
+Top1000,poor,https://www.youtube.com/embed//Ejyz4IJMBY8
+Top1000,popular,https://www.youtube.com/embed//PJiTZ1g8FNg
+Top1000,position,https://www.youtube.com/embed//YLoIhYH24Lk
+Top1000,positive,https://www.youtube.com/embed//Kw8Jl_kP8Ts
+Top1000,possible,https://www.youtube.com/embed//xBlASQ0CTbQ
+Top1000,power,https://www.youtube.com/embed//ec0H0c-Ppds
+Top1000,practice,https://www.youtube.com/embed//nHUxT-iHJwM
+Top1000,prepare,https://www.youtube.com/embed//-_uz-MBlLZs
+Top1000,present,https://www.youtube.com/embed//Wwr2NjFKteg
+Top1000,president,https://www.youtube.com/embed//XuNvPyMBB4M
+Top1000,pressure,https://www.youtube.com/embed//PpuAHXAUXAQ
+Top1000,pretty,https://www.youtube.com/embed//-FFk0f2q0X0
+Top1000,prevent,https://www.youtube.com/embed//IiUFyCqPp_U
+Top1000,price,https://www.youtube.com/embed//korapY6u45o
+Top1000,private,https://www.youtube.com/embed//Q87vYjUgFqc
+Top1000,problem,https://www.youtube.com/embed//eNutcT89QIQ
+Top1000,process,https://www.youtube.com/embed//OKw5k5Qra68
+Top1000,produce,https://www.youtube.com/embed//mKdOj-IxfPc
+Top1000,product,https://www.youtube.com/embed//zTv_KjriF_g
+Top1000,production,https://www.youtube.com/embed//3nWiUJrtbh8
+Top1000,professional,https://www.youtube.com/embed//g88ErgoAIv8
+Top1000,professor,https://www.youtube.com/embed//wZDXUAxjw_g
+Top1000,program,https://www.youtube.com/embed//QWPNcp9nirg
+Top1000,project,https://www.youtube.com/embed//sJHI_20qYDw
+Top1000,property,https://www.youtube.com/embed//N4tYD_wlKF8
+Top1000,protect,https://www.youtube.com/embed//QXriz841hGk
+Top1000,prove,https://www.youtube.com/embed//wKD0KsWl1-k
+Top1000,provide,https://www.youtube.com/embed//beAnIAzZ8pQ
+Top1000,public,https://www.youtube.com/embed//iY686ocXrvM
+Top1000,pull,https://www.youtube.com/embed//kO_5FgRTVCs
+Top1000,purpose,https://www.youtube.com/embed//kQVQvT_dv2A
+Top1000,push,https://www.youtube.com/embed//-PJpxxxfNw4
+Top1000,put,https://www.youtube.com/embed//beja5zhOpOo
+Top1000,quality,https://www.youtube.com/embed//2yVDVVRC91g
+Top1000,question,https://www.youtube.com/embed//9V46myo_zWA
+Top1000,quickly,https://www.youtube.com/embed//X7QwunZGQF4
+Top1000,quite,https://www.youtube.com/embed//yoLXNHKuhjM
+Top1000,race,https://www.youtube.com/embed//2udgTcSbKrI
+Top1000,radio,https://www.youtube.com/embed//TU-VgMd_Yco
+Top1000,raise,https://www.youtube.com/embed//_HSKzzU9rPA
+Top1000,range,https://www.youtube.com/embed//hAicnOUU2uI
+Top1000,rate,https://www.youtube.com/embed//XxmwkI1wewg
+Top1000,rather,https://www.youtube.com/embed//a4TE_A8A06Y
+Top1000,reach,https://www.youtube.com/embed//HcEPT0eENz8
+Top1000,read,https://www.youtube.com/embed//LbNAbf-XhlM
+Top1000,ready,https://www.youtube.com/embed//dZY1SDSZNR8
+Top1000,real,https://www.youtube.com/embed//zlDjTQD29Ug
+Top1000,reality,https://www.youtube.com/embed//UFQ8dwVbB-8
+Top1000,realize,https://www.youtube.com/embed//m-sTSg-3NhE
+Top1000,really,https://www.youtube.com/embed//NXi5Ix4zEgY
+Top1000,reason,https://www.youtube.com/embed//sU2Tmrlns9c
+Top1000,receive,https://www.youtube.com/embed//NGdL4eJFR14
+Top1000,recent,https://www.youtube.com/embed//PBpeJcpk7t8
+Top1000,recently,https://www.youtube.com/embed//bkd2s-otnOA
+Top1000,recognize,https://www.youtube.com/embed//8PQk-1OlPto
+Top1000,record,https://www.youtube.com/embed//7SklyHtZLu0
+Top1000,red,https://www.youtube.com/embed//lDBvf8SoQuc
+Top1000,reduce,https://www.youtube.com/embed//HEasb080oEU
+Top1000,reflect,https://www.youtube.com/embed//K0SWejLvafQ
+Top1000,region,https://www.youtube.com/embed//tK7tKyQD3uE
+Top1000,relate,https://www.youtube.com/embed//8vmZbgOsbhU
+Top1000,relationship,https://www.youtube.com/embed//8bfb4_ZMcmk
+Top1000,religious,https://www.youtube.com/embed//yEGrlfPhcbs
+Top1000,remain,https://www.youtube.com/embed//6N-DC26td4o
+Top1000,remember,https://www.youtube.com/embed//AlQ5uuZk0ps
+Top1000,remove,https://www.youtube.com/embed//5FikUvgMCPw
+Top1000,report,https://www.youtube.com/embed//ULhwxIZ2nHg
+Top1000,represent,https://www.youtube.com/embed//1iLC0POUcQ4
+Top1000,Republican,https://www.youtube.com/embed//R4-y5Lueee8
+Top1000,require,https://www.youtube.com/embed//jGrUpxvtlqI
+Top1000,research,https://www.youtube.com/embed//UTRYoKpNYDI
+Top1000,resource,https://www.youtube.com/embed//JnvoFsP_FM4
+Top1000,respond,https://www.youtube.com/embed//77gOWHAMY-s
+Top1000,response,https://www.youtube.com/embed//QMqKPulHqZM
+Top1000,responsibility,https://www.youtube.com/embed//K5F6N790_-k
+Top1000,rest,https://www.youtube.com/embed//hfm2K1_ueP0
+Top1000,result,https://www.youtube.com/embed//gZ_IElKUUsg
+Top1000,return,https://www.youtube.com/embed//x3kW9-DVl-c
+Top1000,reveal,https://www.youtube.com/embed//5lyLxyts9-w
+Top1000,rich,https://www.youtube.com/embed//yNXqyOg16Qc
+Top1000,right,https://www.youtube.com/embed//Bfo3IPpc9-I
+Top1000,rise,https://www.youtube.com/embed//fvgxKDdUo4w
+Top1000,risk,https://www.youtube.com/embed//wVZ8QPSAamI
+Top1000,road,https://www.youtube.com/embed//suYp8zCSpWo
+Top1000,rock,https://www.youtube.com/embed//hJaWJtoa1jA
+Top1000,role,https://www.youtube.com/embed//gv7yWaHr7k8
+Top1000,room,https://www.youtube.com/embed//ByET2PW3OrQ
+Top1000,rule,https://www.youtube.com/embed//no67o0hzEcQ
+Top1000,run,https://www.youtube.com/embed//jPGs28X_O54
+Top1000,safe,https://www.youtube.com/embed//agEa8L5F4q4
+Top1000,same,https://www.youtube.com/embed//cnX45VWbjmc
+Top1000,save,https://www.youtube.com/embed//PsEMHQEHNhE
+Top1000,say,https://www.youtube.com/embed//fka6bGd2TX8
+Top1000,scene,https://www.youtube.com/embed//P1o8Q6CwPJk
+Top1000,school,https://www.youtube.com/embed//vuE3RN10AGA
+Top1000,science,https://www.youtube.com/embed//B6KnaOCGG8w
+Top1000,scientist,https://www.youtube.com/embed//wpcV0y9OPzg
+Top1000,score,https://www.youtube.com/embed//D13LEr6dWNY
+Top1000,sea,https://www.youtube.com/embed//_mOM1vGaFcs
+Top1000,season,https://www.youtube.com/embed//kdo-Tn7Klnc
+Top1000,seat,https://www.youtube.com/embed//9THlDKVfQJM
+Top1000,second,https://www.youtube.com/embed//-PNCpqJXy_A
+Top1000,section,https://www.youtube.com/embed//-Vxea9Rx_kA
+Top1000,security,https://www.youtube.com/embed//EMhlLKIIsBs
+Top1000,see,https://www.youtube.com/embed//7XQiv-PxecU
+Top1000,seek,https://www.youtube.com/embed//S0388ARjqm0
+Top1000,seem,https://www.youtube.com/embed//oaTwtikdiuE
+Top1000,sell,https://www.youtube.com/embed//6QY2WDxRpg4
+Top1000,send,https://www.youtube.com/embed//btjZ2F9BUAA
+Top1000,senior,https://www.youtube.com/embed//eK42I75KAYY
+Top1000,sense,https://www.youtube.com/embed//Yuc8uoiNDzs
+Top1000,series,https://www.youtube.com/embed//Ii8XmpBfzrs
+Top1000,serious,https://www.youtube.com/embed//7xrkPHuLv74
+Top1000,serve,https://www.youtube.com/embed//DZobxFPZLgg
+Top1000,service,https://www.youtube.com/embed//acBMOxnGTjA
+Top1000,set,https://www.youtube.com/embed//IGbxkxbhRS4
+Top1000,seven,https://www.youtube.com/embed//jaOgr8FVFck
+Top1000,several,https://www.youtube.com/embed//s3L8_TvWFoE
+Top1000,sex,https://www.youtube.com/embed//NAj-F8ecEd0
+Top1000,sexual,https://www.youtube.com/embed//NAj-F8ecEd0
+Top1000,shake,https://www.youtube.com/embed//091N9FD1oJs
+Top1000,share,https://www.youtube.com/embed//mWLScxe2_P0
+Top1000,she,https://www.youtube.com/embed//QvR_BQGAf4U
+Top1000,shoot,https://www.youtube.com/embed//Ob7lEjlCIt4
+Top1000,short,https://www.youtube.com/embed//TooM2jWw9CU
+Top1000,shot,https://www.youtube.com/embed//9kNwZIFH94A
+Top1000,should,https://www.youtube.com/embed//B84UGJp2vg0
+Top1000,shoulder,https://www.youtube.com/embed//lwI3rjn5hWc
+Top1000,show,https://www.youtube.com/embed//9NV3BK_bxHE
+Top1000,side,https://www.youtube.com/embed//ExX2W4zYBd8
+Top1000,sign,https://www.youtube.com/embed//aEFfWgMsZSk
+Top1000,significant,https://www.youtube.com/embed//drfNg1EyDZo
+Top1000,similar,https://www.youtube.com/embed//iX8QDUVGe8c
+Top1000,since,https://www.youtube.com/embed//tHr_Es_dL9s
+Top1000,sing,https://www.youtube.com/embed//-OYTTmF4m8M
+Top1000,single,https://www.youtube.com/embed//_Dy2bz-pEqI
+Top1000,sister,https://www.youtube.com/embed//1skSbSMPlMI
+Top1000,sit,https://www.youtube.com/embed//ZvzKTn4qWfA
+Top1000,site,https://www.youtube.com/embed//Dx6uxM2bZDE
+Top1000,situation,https://www.youtube.com/embed//x-08NZhEKAc
+Top1000,six,https://www.youtube.com/embed//CuAcagWcLCs
+Top1000,size,https://www.youtube.com/embed//zTOs_g4EYnQ
+Top1000,skill,https://www.youtube.com/embed//jVovA5JbRfQ
+Top1000,skin,https://www.youtube.com/embed//790kMS6cHJk
+Top1000,small,https://www.youtube.com/embed//RKnUlZ8bOzs
+Top1000,so,https://www.youtube.com/embed//fhhBx_WQGAo
+Top1000,social,https://www.youtube.com/embed//DH6yQjlHRms
+Top1000,society,https://www.youtube.com/embed//41s77qLHfiQ
+Top1000,soldier,https://www.youtube.com/embed//BBuubXnY_YY
+Top1000,some,https://www.youtube.com/embed//nqEYs4aBk7Y
+Top1000,someone,https://www.youtube.com/embed//YkiB6IwSEZI
+Top1000,something,https://www.youtube.com/embed//AvNGVoyH1sI
+Top1000,sometimes,https://www.youtube.com/embed//u6cQNKM4Dbs
+Top1000,son,https://www.youtube.com/embed//JtgGFe8HIFQ
+Top1000,song,https://www.youtube.com/embed//-OYTTmF4m8M
+Top1000,soon,https://www.youtube.com/embed//pkNaLLQKuUU
+Top1000,sort,https://www.youtube.com/embed//VZBfHzqp_WE
+Top1000,sound,https://www.youtube.com/embed//-bUDA4psPxI
+Top1000,source,https://www.youtube.com/embed//xm8J826YelI
+Top1000,south,https://www.youtube.com/embed//5z1F79knaF0
+Top1000,southern,https://www.youtube.com/embed//5z1F79knaF0
+Top1000,space,https://www.youtube.com/embed//TsLhZmNNqCU
+Top1000,speak,https://www.youtube.com/embed//aPLfEt5n7L0
+Top1000,special,https://www.youtube.com/embed//RzMF8QUpclE
+Top1000,specific,https://www.youtube.com/embed//nQigYlN51kQ
+Top1000,speech,https://www.youtube.com/embed//hfQmSaGu_4U
+Top1000,spend,https://www.youtube.com/embed//_jLUxGrWtrQ
+Top1000,sport,https://www.youtube.com/embed//teRqbb5GxeY
+Top1000,spring,https://www.youtube.com/embed//5h69GQntuhw
+Top1000,staff,https://www.youtube.com/embed//G11HdoSzu_k
+Top1000,stage,https://www.youtube.com/embed//I6XCr2NjtZQ
+Top1000,stand,https://www.youtube.com/embed//KhhowNO7Ywk
+Top1000,standard,https://www.youtube.com/embed//wyu3MMflhwg
+Top1000,star,https://www.youtube.com/embed//o_oZ2KuuH48
+Top1000,start,https://www.youtube.com/embed//BQZTu_j6cLE
+Top1000,state,https://www.youtube.com/embed//KpD6JTWnqv0
+Top1000,statement,https://www.youtube.com/embed//v9aC3CTfrQk
+Top1000,station,https://www.youtube.com/embed//3zdUT_n0yzA
+Top1000,stay,https://www.youtube.com/embed//QmbOr-8K_Kw
+Top1000,step,https://www.youtube.com/embed//xVMtq_MCv8o
+Top1000,still,https://www.youtube.com/embed//bfXH1Yolqys
+Top1000,stock,https://www.youtube.com/embed//bselzczLtqI
+Top1000,stop,https://www.youtube.com/embed//A84uvLUmCVU
+Top1000,store,https://www.youtube.com/embed//CPp1UOM-olA
+Top1000,story,https://www.youtube.com/embed//TqmlL13jZoI
+Top1000,strategy,https://www.youtube.com/embed//vYLpyJFtKns
+Top1000,street,https://www.youtube.com/embed//n9RE7lOpF4w
+Top1000,strong,https://www.youtube.com/embed//RB9VLcVvrWI
+Top1000,structure,https://www.youtube.com/embed//8Q2GcWyAIpc
+Top1000,student,https://www.youtube.com/embed//xqKENRGkOUQ
+Top1000,study,https://www.youtube.com/embed//MI5yNdCJ7kg
+Top1000,stuff,https://www.youtube.com/embed//TrYP51lYFd8
+Top1000,style,https://www.youtube.com/embed//MvY7H53mqY4
+Top1000,subject,https://www.youtube.com/embed//01XoAexKUfg
+Top1000,success,https://www.youtube.com/embed//SrzPozIawec
+Top1000,successful,https://www.youtube.com/embed//IVVxq2gswEM
+Top1000,suddenly,https://www.youtube.com/embed//mlTgLqkZv70
+Top1000,suffer,https://www.youtube.com/embed//tNwKMRmxq0g
+Top1000,suggest,https://www.youtube.com/embed//rcFqIu5BZiY
+Top1000,summer,https://www.youtube.com/embed//AaXReP9YjVE
+Top1000,support,https://www.youtube.com/embed//zIPyWpDlY24
+Top1000,sure,https://www.youtube.com/embed//5buYOQR51yU
+Top1000,surface,https://www.youtube.com/embed//vqzEHqvpwDk
+Top1000,system,https://www.youtube.com/embed//LESQI_1r53k
+Top1000,table,https://www.youtube.com/embed//mEgQI-DHntY
+Top1000,take,https://www.youtube.com/embed//lz0WSwPSd3c
+Top1000,talk,https://www.youtube.com/embed//qXCW47T82Ck
+Top1000,tax,https://www.youtube.com/embed//mRYvl_vAvF4
+Top1000,teach,https://www.youtube.com/embed//cUpQCU24VC0
+Top1000,teacher,https://www.youtube.com/embed//hJZhwVjk-eo
+Top1000,team,https://www.youtube.com/embed//5gTq_ttM6Qo
+Top1000,technology,https://www.youtube.com/embed//5Kq8IEFuaew
+Top1000,television,https://www.youtube.com/embed//L7VJjHM2l9A
+Top1000,tell,https://www.youtube.com/embed//SvfopPYaJJU
+Top1000,ten,https://www.youtube.com/embed//WpZChp88fMo
+Top1000,tend,https://www.youtube.com/embed//Ky4WSi_54pY
+Top1000,term,https://www.youtube.com/embed//k0CrGZMtEEg
+Top1000,test,https://www.youtube.com/embed//GtBVLsZBlC8
+Top1000,than,https://www.youtube.com/embed//BCkC83xh8SA
+Top1000,thank,https://www.youtube.com/embed//IvRwNLNR4_w
+Top1000,that,https://www.youtube.com/embed//1aDmZKATrbk
+Top1000,their,https://www.youtube.com/embed//YibcX4wyVtI
+Top1000,them,https://www.youtube.com/embed//ZAFWyaHFiKg
+Top1000,themselves,https://www.youtube.com/embed//n5NIhFE3wy4
+Top1000,then,https://www.youtube.com/embed//1a2K-NNgODY
+Top1000,theory,https://www.youtube.com/embed//ZFq2RPlwOrg
+Top1000,there,https://www.youtube.com/embed//BNaT6o7mS4s
+Top1000,these,https://www.youtube.com/embed//WI2LdxreJV0
+Top1000,they,https://www.youtube.com/embed//13kQeMdVEqg
+Top1000,thing,https://www.youtube.com/embed//OPu_3piG0hc
+Top1000,think,https://www.youtube.com/embed//NdTKb3Kig88
+Top1000,third,https://www.youtube.com/embed//0AzcUTFCeVI
+Top1000,this,https://www.youtube.com/embed//WjuTxe9GfnI
+Top1000,those,https://www.youtube.com/embed//yV5pl226xfE
+Top1000,though,https://www.youtube.com/embed//m7ylgA43QyE
+Top1000,thought,https://www.youtube.com/embed//m7ylgA43QyE
+Top1000,threat,https://www.youtube.com/embed//43laA2NXtP8
+Top1000,three,https://www.youtube.com/embed//3EgAak4PtN4
+Top1000,through,https://www.youtube.com/embed//U5ABRApQ7DI
+Top1000,throughout,https://www.youtube.com/embed//eF6hGI7lDP4
+Top1000,throw,https://www.youtube.com/embed//vsx5G2yhMR4
+Top1000,thus,https://www.youtube.com/embed//ClbxmT_oDVA
+Top1000,time,https://www.youtube.com/embed//ANRCVPkuN8Y
+Top1000,to,https://www.youtube.com/embed//2QnEVRZ9_Mc
+Top1000,today,https://www.youtube.com/embed//h-CPqg-ZuBA
+Top1000,together,https://www.youtube.com/embed//iTOObV_mQvE
+Top1000,tonight,https://www.youtube.com/embed//oT0GJQFajVs
+Top1000,too,https://www.youtube.com/embed//eulS8NwDgVo
+Top1000,top,https://www.youtube.com/embed//eFsZ6FwpX8g
+Top1000,total,https://www.youtube.com/embed//PcSsUHX-KS4
+Top1000,tough,https://www.youtube.com/embed//F7k5zLxF71I
+Top1000,toward,https://www.youtube.com/embed//i8q4HtExOBo
+Top1000,town,https://www.youtube.com/embed//VBHgQY39dgc
+Top1000,trade,https://www.youtube.com/embed//A0_B8ZK-nC4
+Top1000,traditional,https://www.youtube.com/embed//ysWZt0n6Lkc
+Top1000,training,https://www.youtube.com/embed//-Jp--G6K7wA
+Top1000,travel,https://www.youtube.com/embed//ZtG9hL7slCA
+Top1000,treat,https://www.youtube.com/embed//n28Ev5STFWw
+Top1000,treatment,https://www.youtube.com/embed//X_BU_Oo5tZk
+Top1000,tree,https://www.youtube.com/embed//DMdPpkiUJso
+Top1000,trial,https://www.youtube.com/embed//H1P-OJjOkxI
+Top1000,trip,https://www.youtube.com/embed//ZtG9hL7slCA
+Top1000,trouble,https://www.youtube.com/embed//X17H7Fyao_o
+Top1000,true,https://www.youtube.com/embed//zlDjTQD29Ug
+Top1000,truth,https://www.youtube.com/embed//It4pQoTx0ys
+Top1000,try,https://www.youtube.com/embed//emGAgGrZ4ug
+Top1000,turn,https://www.youtube.com/embed//alngb2i-Ak4
+Top1000,TV,https://www.youtube.com/embed//XH8-L7NjeNY
+Top1000,two,https://www.youtube.com/embed//K_0NBMTwwiE
+Top1000,type,https://www.youtube.com/embed//KRJs0qL4LdY
+Top1000,under,https://www.youtube.com/embed//Esuc74eXfMA
+Top1000,understand,https://www.youtube.com/embed//WYIWU44xpyc
+Top1000,unit,https://www.youtube.com/embed//RbJtzSPqpck
+Top1000,until,https://www.youtube.com/embed//vVUmUuo0JOM
+Top1000,up,https://www.youtube.com/embed//7xB0H2KKuRI
+Top1000,upon,https://www.youtube.com/embed//oE8a3noR4Aw
+Top1000,us,https://www.youtube.com/embed//3EgAak4PtN4
+Top1000,use,https://www.youtube.com/embed//fNF72XrF0ZY
+Top1000,usually,https://www.youtube.com/embed//uC4EjRC6viI
+Top1000,value,https://www.youtube.com/embed//iMl2vq3f1IA
+Top1000,various,https://www.youtube.com/embed//QkELbQIz2yw
+Top1000,very,https://www.youtube.com/embed//ghFoR3rA12U
+Top1000,victim,https://www.youtube.com/embed//AA_tYu14dmo
+Top1000,view,https://www.youtube.com/embed//-17aARFvGlg
+Top1000,violence,https://www.youtube.com/embed//zBAMlk0CFuM
+Top1000,visit,https://www.youtube.com/embed//wosMxHHFE_4
+Top1000,voice,https://www.youtube.com/embed//nlvSqnQhjOw
+Top1000,vote,https://www.youtube.com/embed//4jJq0AU7oXM
+Top1000,wait,https://www.youtube.com/embed//YfwgS9ZsBVw
+Top1000,walk,https://www.youtube.com/embed//5iv2XtBzogU
+Top1000,wall,https://www.youtube.com/embed//6QwJs9xhOuU
+Top1000,want,https://www.youtube.com/embed//VnsXJs29sXQ
+Top1000,war,https://www.youtube.com/embed//klNBrWjBc7o
+Top1000,watch,https://www.youtube.com/embed//4cn6Fyzz8ns
+Top1000,water,https://www.youtube.com/embed//e7_zscB_EVw
+Top1000,way,https://www.youtube.com/embed//bMqWKM4-k4A
+Top1000,we,https://www.youtube.com/embed//VpIWhS5YKcU
+Top1000,weapon,https://www.youtube.com/embed//FAjMlTauQS0
+Top1000,wear,https://www.youtube.com/embed//GC7LZF7OYLw
+Top1000,week,https://www.youtube.com/embed//Zi42bhO-N-o
+Top1000,weight,https://www.youtube.com/embed//LUNZj1T3g6M
+Top1000,well,https://www.youtube.com/embed//tTDXplV6TKA
+Top1000,west,https://www.youtube.com/embed//TyPXiMvAAeE
+Top1000,what,https://www.youtube.com/embed//sSdQWC7mUZc
+Top1000,whatever,https://www.youtube.com/embed//-IQRYVpbhjI
+Top1000,when,https://www.youtube.com/embed//GC99dBIdtyg
+Top1000,where,https://www.youtube.com/embed//qxh-EVaK6kY
+Top1000,which,https://www.youtube.com/embed//T83OCDixkYQ
+Top1000,while,https://www.youtube.com/embed//9rZCRa4W6L0
+Top1000,white,https://www.youtube.com/embed//v8h6mw4zGys
+Top1000,who,https://www.youtube.com/embed//pBnGrdxhxHQ
+Top1000,whole,https://www.youtube.com/embed//0g2fVZOtjlI
+Top1000,whose,https://www.youtube.com/embed//9SgH9BWe3L0
+Top1000,why,https://www.youtube.com/embed//K0yp2v6Atxs
+Top1000,wide,https://www.youtube.com/embed//hggKBaHjBL8
+Top1000,wife,https://www.youtube.com/embed//OEVerZAldm4
+Top1000,will,https://www.youtube.com/embed//6YSr9tEaaTU
+Top1000,win,https://www.youtube.com/embed//4cmAs02vDBQ
+Top1000,wind,https://www.youtube.com/embed//RA04zvXojYA
+Top1000,window,https://www.youtube.com/embed//VqFX50Z9Y60
+Top1000,wish,https://www.youtube.com/embed//WWI-xmA8Czc
+Top1000,with,https://www.youtube.com/embed//g4AwGIjxn7k
+Top1000,within,https://www.youtube.com/embed//W-hU2HfZSq8
+Top1000,without,https://www.youtube.com/embed//PkFQGB49Nuc
+Top1000,woman,https://www.youtube.com/embed//GobeSyJHyLk
+Top1000,wonder,https://www.youtube.com/embed//mhs6PRqjNhM
+Top1000,word,https://www.youtube.com/embed//QZsTrcfh4bI
+Top1000,work,https://www.youtube.com/embed//2BQMs1xdSms
+Top1000,worker,https://www.youtube.com/embed//akaN6CRjpt0
+Top1000,world,https://www.youtube.com/embed//-H4PejCdr6Y
+Top1000,worry,https://www.youtube.com/embed//HX-57T9JTwI
+Top1000,would,https://www.youtube.com/embed//IRUlCZ9jRjM
+Top1000,write,https://www.youtube.com/embed//rqBe62cqd6w
+Top1000,writer,https://www.youtube.com/embed//rqBe62cqd6w
+Top1000,wrong,https://www.youtube.com/embed//GLAPZdS-gpU
+Top1000,yard,https://www.youtube.com/embed//oUPH3ELzeco
+Top1000,yeah,https://www.youtube.com/embed//uz5-tROTVTE
+Top1000,year,https://www.youtube.com/embed//4-E2-OA6T-o
+Top1000,yes,https://www.youtube.com/embed//0usayvOXzHo
+Top1000,yet,https://www.youtube.com/embed//oEreZSPVRfo
+Top1000,you,https://www.youtube.com/embed//R6-Md4KCHPY
+Top1000,young,https://www.youtube.com/embed//I02FA61xpCs
+Top1000,your,https://www.youtube.com/embed//-1Hz72xltNk
+Top1000,yourself,https://www.youtube.com/embed//0WE5FktWpnc`;
+
+      // Parse inline default word list
+      window.addEventListener("load", () => {
+        const DEFAULT_CSV_INLINE = `General,A.S.L.,https://www.youtube.com/embed//66psMZuKC_w
+General,How Much,https://www.youtube.com/embed//xqHh0rcmlcY
+General,Communicate,https://www.youtube.com/embed//Ub_TFaB9I7s
+General,Don't Want,https://www.youtube.com/embed//CbKDY9CGcJk
+General,Heavy,https://www.youtube.com/embed//p8m9-RMJ-8Y
+General,Holy,https://www.youtube.com/embed/1VNpO-DPYa4?start=271
+General,Kitchen (3),https://www.youtube.com/embed/G6hVRVG74lc?start=65
+General,Look/Appear,
+General,Haven't/Not Yet,
+General,Deaf,https://www.youtube.com/embed//sP4e9vRUCYM
+General,Orange,https://www.youtube.com/embed//Wt4p6qWgR1k
+General,Fat,https://www.youtube.com/embed//tSR-NTrC_JA
+General,Grey,https://www.youtube.com/embed//KYd1QImWeTw
+General,Ocean/Sea,
+General,Want,https://www.youtube.com/embed//VnsXJs29sXQ
+General,Many,https://www.youtube.com/embed//Ku9SWR4uSUI
+General,Minute(s),https://www.youtube.com/embed/G6hVRVG74lc?start=186
+General,Nephew,https://www.youtube.com/embed//Ef4RZhDwuhQ
+General,Hard of Hearing,https://www.youtube.com/embed//gz_R3F29Je0
+General,Thank You,https://www.youtube.com/embed//IvRwNLNR4_w
+General,Set Your Alarm Clock,https://www.youtube.com/embed/3DLEb7h23jU?start=585
+General,Give,https://www.youtube.com/embed//U5p42-d-buw
+General,Single,https://www.youtube.com/embed/odDE9nzsCw4?start=569
+General,Living Room (2),https://www.youtube.com/embed/G6hVRVG74lc?start=68
+General,Live,
+General,Finish/Done,https://www.youtube.com/embed/4Ll3OtqAzyw?start=95
+General,Aunt,https://www.youtube.com/embed//_c8v25YlVyY
+General,Dog,https://www.youtube.com/embed//IbpJtH_QssM
+General,Goodbye,https://www.youtube.com/embed/odDE9nzsCw4?start=721
+General,Large,https://www.youtube.com/embed//_0ltTWDlWyo
+General,Sister,https://www.youtube.com/embed//1skSbSMPlMI
+General,House,https://www.youtube.com/embed//CJMH2YMuC6I
+General,Cheap,https://www.youtube.com/embed//H-39q5BLM44
+General,Tall,https://www.youtube.com/embed/odDE9nzsCw4?start=650
+General,In,https://www.youtube.com/embed//YirRi12-zWo
+General,Don't Understand,https://www.youtube.com/embed/odDE9nzsCw4?start=696
+General,Secret,https://www.youtube.com/embed//L9TfGkTHI-w
+General,Old,https://www.youtube.com/embed//wmJfQSUsnQ8
+General,Slow,https://www.youtube.com/embed/odDE9nzsCw4?start=217
+General,Do/Did,
+General,No,https://www.youtube.com/embed//QJXKaOSyl4o
+General,Write,https://www.youtube.com/embed//rqBe62cqd6w
+General,To Go Out,https://www.youtube.com/embed/3DLEb7h23jU?start=291
+General,School,https://www.youtube.com/embed//vuE3RN10AGA
+General,Purple,https://www.youtube.com/embed//zgdzYtHB6jg
+General,Help,https://www.youtube.com/embed/4Ll3OtqAzyw?start=128
+General,Cheese,https://www.youtube.com/embed//_s96-SeiXfo
+General,Night,https://www.youtube.com/embed//hDcREO5I4Ps
+General,Nice,
+General,Don't Like,https://www.youtube.com/embed/odDE9nzsCw4?start=473
+General,New,https://www.youtube.com/embed//cftJMIT87TQ
+General,Know,https://www.youtube.com/embed//Ht2B0VzHFwQ
+General,Book,https://www.youtube.com/embed//Kwvw-K6GYW8
+General,Great,
+General,Need,https://www.youtube.com/embed//7py1g9DyMcI
+General,Blue,https://www.youtube.com/embed//t2T1_LMVTp8
+General,Don't Know,https://www.youtube.com/embed//MGiLPwMUquI
+General,Married,https://www.youtube.com/embed//71kDb2VVnhM
+General,Scared,https://www.youtube.com/embed//s74FnhnxRoM
+General,Have,https://www.youtube.com/embed//Tg44F2vYVY4
+General,Forget,https://www.youtube.com/embed//N18WPFcphhs
+General,Children,https://www.youtube.com/embed//4xwu8BWdfus
+General,Again,https://www.youtube.com/embed//YEz-iyZ0kL0
+General,On,
+General,Hour,https://www.youtube.com/embed//IO0cNQ8OO-4
+General,Hard,https://www.youtube.com/embed//RgGjl2y6dkM
+General,Year,https://www.youtube.com/embed//zTIJAgTai40
+General,Small,https://www.youtube.com/embed//RKnUlZ8bOzs
+General,Yes,https://www.youtube.com/embed//0usayvOXzHo
+General,Everywhere,
+General,Sandwich,https://www.youtube.com/embed//VtHbPT3s6s8
+General,How are You?,https://www.youtube.com/embed//FzBe247cv4w
+General,Pop (Drink),
+General,Uncle,https://www.youtube.com/embed//PqtMCA2lu9w
+General,Open,https://www.youtube.com/embed//LEWPXaskrJk
+General,Expensive,https://www.youtube.com/embed//ZdmmD6ZsQrw
+General,Brown,https://www.youtube.com/embed//PrniQgULERg
+General,Weak,https://www.youtube.com/embed/odDE9nzsCw4?start=608
+General,Which,https://www.youtube.com/embed//T83OCDixkYQ
+General,See You later,https://www.youtube.com/embed//3n81DT4NTOw
+General,Water,https://www.youtube.com/embed//e7_zscB_EVw
+General,Cold,https://www.youtube.com/embed/odDE9nzsCw4?start=404
+General,Cool,https://www.youtube.com/embed/odDE9nzsCw4?start=385
+General,Play,https://www.youtube.com/embed//ODByBNyosxc
+General,Yellow,https://www.youtube.com/embed//nK4_8-U-Y9I
+General,If,https://www.youtube.com/embed//M8CXHkOskvo
+General,Teacher,https://www.youtube.com/embed//hJZhwVjk-eo
+General,Mom,https://www.youtube.com/embed//DHl2-NT3mIM
+General,Divorced,
+General,Can,https://www.youtube.com/embed//BVypOVtFnNk
+General,Quiet,https://www.youtube.com/embed//xq2ZodH6gzk
+General,Left,https://www.youtube.com/embed/odDE9nzsCw4?start=520
+General,Wife,https://www.youtube.com/embed//OEVerZAldm4
+General,Right,https://www.youtube.com/embed/odDE9nzsCw4?start=520
+General,Wrong,https://www.youtube.com/embed//GLAPZdS-gpU
+General,For For (What/Why is That),
+General,Put On Makeup,https://www.youtube.com/embed/3DLEb7h23jU?start=87
+General,Eat,https://www.youtube.com/embed//OmylSinUxns
+General,Drink,https://www.youtube.com/embed//LqJM7wcUixQ
+General,Holy Spirit,https://www.youtube.com/embed/1VNpO-DPYa4?start=149
+General,Telephone,
+General,Right/Correct,https://www.youtube.com/embed/4Ll3OtqAzyw?start=223
+General,Gymnastics,https://www.youtube.com/embed//eIjsa-MRaoo
+General,Wake Up,https://www.youtube.com/embed/3DLEb7h23jU?start=203
+General,Far,https://www.youtube.com/embed//zVJ7-WuHsow
+General,Study,https://www.youtube.com/embed//MI5yNdCJ7kg
+General,Nothing,
+General,Get Up,https://www.youtube.com/embed/3DLEb7h23jU?start=212
+General,Go,https://www.youtube.com/embed//G4a8k_C92Oc
+General,Family,https://www.youtube.com/embed/G6hVRVG74lc?start=219
+General,Splits,
+General,Face,https://www.youtube.com/embed//vToOzx3lsVQ
+General,Hearing,https://www.youtube.com/embed//EOUkGLfYQ7M
+General,Noon,https://www.youtube.com/embed//gEUUQT-arjQ
+General,Why (2),https://www.youtube.com/embed/G6hVRVG74lc?start=145
+General,Paper,https://www.youtube.com/embed//Zg7-DM25KIM
+General,What's Up?,https://www.youtube.com/embed//ODrjhBDS2xs
+General,Also/Too,
+General,Walk (2),
+General,Candy,https://www.youtube.com/embed//EfJ4xLiX5IA
+General,Girlfriend,https://www.youtube.com/embed//4B3VtEF78lM
+General,Take Care,
+General,Future,
+General,Fall Asleep,https://www.youtube.com/embed/3DLEb7h23jU?start=165
+General,Age,
+General,Death/Die/Pass Away,https://www.youtube.com/embed/1VNpO-DPYa4?start=431
+General,Sorry,
+General,Burn Up/Burn Down,
+General,Bathroom/Toilete,https://www.youtube.com/embed/G6hVRVG74lc?start=55
+General,Loud,https://www.youtube.com/embed//oJXUGrQFYGY
+General,Baby,https://www.youtube.com/embed//ljYpx7ee9zg
+General,Draw,https://www.youtube.com/embed//ua6jgiWYZPw
+General,Can't,https://www.youtube.com/embed//uV_Ee95rsrY
+General,Wet,https://www.youtube.com/embed/odDE9nzsCw4?start=678
+General,Full,https://www.youtube.com/embed//9l0svQl0Pmk
+General,Hamburger,https://www.youtube.com/embed//IIt5fF-D6d0
+General,Month,https://www.youtube.com/embed//YLuGuPS6NU8
+General,Name,https://www.youtube.com/embed//GbeC9TFuSX4
+General,Car,https://www.youtube.com/embed//KnZRyc5aYO0
+General,Meanwhile,
+General,Come,
+General,Swim,
+General,Change Clothes,https://www.youtube.com/embed/3DLEb7h23jU?start=98
+General,Food,https://www.youtube.com/embed/G6hVRVG74lc?start=89
+General,And,https://www.youtube.com/embed//O5wvGmVozmw
+General,Buy,https://www.youtube.com/embed//wEPDfmy2M8w
+General,Pink,https://www.youtube.com/embed//aNilWTBIl0g
+General,Week,https://www.youtube.com/embed/G6hVRVG74lc?start=204
+General,Run,
+General,Grandfather,https://www.youtube.com/embed/G6hVRVG74lc?start=223
+General,Very,
+General,Dry,https://www.youtube.com/embed//ki6TeQOTo1U
+General,Same Old (the usual),https://www.youtube.com/embed/QYYMBAEs6Vg?start=178
+General,Strong,https://www.youtube.com/embed//RB9VLcVvrWI
+General,Chat,
+General,Every Once In a While,https://www.youtube.com/embed/3DLEb7h23jU?start=510
+General,Sentence,https://www.youtube.com/embed//Gm513X-UNwo
+General,Battle,
+General,Friends,
+General,Same,https://www.youtube.com/embed//cnX45VWbjmc
+General,White,https://www.youtube.com/embed//v8h6mw4zGys
+General,Restaurant,https://www.youtube.com/embed//AAA7dpfXuKs
+General,Home,https://www.youtube.com/embed//n0Xb58PVX_A
+General,Arrive,https://www.youtube.com/embed//kgsXlwRNM6c
+General,Warm,https://www.youtube.com/embed//rSgVWUc1J0w
+General,More,https://www.youtube.com/embed//nJwr-yWRdNQ
+General,Black,https://www.youtube.com/embed//O5_4x8p5t4U
+General,Near,https://www.youtube.com/embed/odDE9nzsCw4?start=190
+General,Thin,https://www.youtube.com/embed/odDE9nzsCw4?start=246
+General,Oversleep/Sleep In,https://www.youtube.com/embed/3DLEb7h23jU?start=190
+General,Hello,https://www.youtube.com/embed//FVjpLa8GqeM
+General,Past,https://www.youtube.com/embed//L2x7sOguFg0
+General,Short,https://www.youtube.com/embed/odDE9nzsCw4?start=650
+General,Light,https://www.youtube.com/embed//IcF-D_eJhi0
+General,Not/Don't/Doesn't,https://www.youtube.com/embed/4Ll3OtqAzyw?start=204
+General,Good,https://www.youtube.com/embed/4Ll3OtqAzyw?start=343
+General,Nice to Meet You,https://www.youtube.com/embed//F7Wjb_AIvMA
+General,Red,https://www.youtube.com/embed//lDBvf8SoQuc
+General,Learn,https://www.youtube.com/embed//78mzpzvN9tc
+General,Hot,https://www.youtube.com/embed//a0robonALIk
+General,Tired,https://www.youtube.com/embed//iZ6EeQqzZl0
+General,So-So,https://www.youtube.com/embed//fhhBx_WQGAo
+General,Please,https://www.youtube.com/embed//rnb9FxPO7is
+General,Like,https://www.youtube.com/embed//8uIg8r1awC4
+General,Ice Cream,
+General,Text,
+General,Spell Again,
+General,Sneak,
+General,Ready,
+General,Punch,
+General,Class,https://www.youtube.com/embed//zYsmQgZRW0g
+General,Shut a Door,https://www.youtube.com/embed/odDE9nzsCw4?start=495
+General,Friend,https://www.youtube.com/embed//6RRmIyhkMx0
+General,Understand,https://www.youtube.com/embed/odDE9nzsCw4?start=696
+General,Mushroom,https://www.youtube.com/embed//mZVixrzz_MM
+General,Cat,https://www.youtube.com/embed//ekFrFoJ-x78
+General,Husband,https://www.youtube.com/embed//TYTsqVZU1dk
+General,Bread,https://www.youtube.com/embed//ZL0F8bLp8HY
+General,Fast,https://www.youtube.com/embed//Zkp9QaiusDA
+General,Hungry,
+General,Few,https://www.youtube.com/embed//SduOhUwKYSc
+General,Niece,https://www.youtube.com/embed//NOv6lpXTnyo
+General,Milk,https://www.youtube.com/embed//PRtOyut96Ps
+General,Day,https://www.youtube.com/embed//6Ag2Q2J9DAU
+General,Bus,
+General,Green,https://www.youtube.com/embed//WrkXE5l6udM
+General,Comb Hair,https://www.youtube.com/embed//HDoI8JaRSYQ
+General,Empty,https://www.youtube.com/embed/odDE9nzsCw4?start=276
+General,Oh, I See,
+General,Island,https://www.youtube.com/embed//zzJli42yUxc
+Numbers,1-20,https://www.youtube.com/embed/Y4stD_ypaAI?start=90
+Numbers,30,https://www.youtube.com/embed//9jxIZI3FnMw
+Numbers,40,https://www.youtube.com/embed//Ze58kuqaAwQ
+Numbers,50,https://www.youtube.com/embed//ItRSk_Upi0Q
+Numbers,60,https://www.youtube.com/embed//udnXe_23QXY
+Numbers,70,https://www.youtube.com/embed/Y4stD_ypaAI?start=420
+Numbers,80,https://www.youtube.com/embed/Y4stD_ypaAI?start=420
+Numbers,90,https://www.youtube.com/embed/Y4stD_ypaAI?start=420
+Numbers,100,https://www.youtube.com/embed//JKsTIkPTtnk
+Numbers,1000,https://www.youtube.com/embed//dRjMLMOPP9U
+Numbers,1000000,https://www.youtube.com/embed/Y4stD_ypaAI?start=540
+Numbers,1000000000,https://www.youtube.com/embed/Y4stD_ypaAI?start=592
+Clothing,Clothes,https://www.youtube.com/embed//15czV0-SagI
+Clothing,Shirt,https://www.youtube.com/embed//4ln_5SQd__w
+Clothing,Pants,https://www.youtube.com/embed//-V0Dkeyno2s
+Clothing,Shorts,https://www.youtube.com/embed/x38n4NAgUto?start=86
+Clothing,Jeans,https://www.youtube.com/embed/x38n4NAgUto?start=94
+Clothing,Leggings,https://www.youtube.com/embed/x38n4NAgUto?start=115
+Clothing,Joggers,https://www.youtube.com/embed/x38n4NAgUto?start=122
+Clothing,Coat,https://www.youtube.com/embed//Iac6y_hJZ7U
+Clothing,Dress,https://www.youtube.com/embed//kDyFU6UL3qk
+Clothing,Skirt,https://www.youtube.com/embed//HPSGvj3-kwA
+Clothing,Tank Top,https://www.youtube.com/embed/x38n4NAgUto?start=161
+Clothing,Hoodie,https://www.youtube.com/embed/x38n4NAgUto?start=172
+Clothing,Sweatshirt,https://www.youtube.com/embed/x38n4NAgUto?start=181
+Clothing,Sweater,https://www.youtube.com/embed/x38n4NAgUto?start=193
+Clothing,Blouse,https://www.youtube.com/embed//uJOQ69hE1YM
+Clothing,Tie,https://www.youtube.com/embed/x38n4NAgUto?start=215
+Clothing,Bow Tie,https://www.youtube.com/embed/x38n4NAgUto?start=225
+Clothing,Suit,https://www.youtube.com/embed//ziUdqb9aRr4
+Clothing,Overalls,https://www.youtube.com/embed/x38n4NAgUto?start=249
+Clothing,Pajamas,https://www.youtube.com/embed/x38n4NAgUto?start=255
+Clothing,Shoes,https://www.youtube.com/embed//M1B5TMhbA24
+Clothing,Boots,https://www.youtube.com/embed/x38n4NAgUto?start=273
+Clothing,Sandals,https://www.youtube.com/embed//awYdq3bnx00
+Clothing,Slippers,https://www.youtube.com/embed/x38n4NAgUto?start=293
+Clothing,High Heels,https://www.youtube.com/embed/x38n4NAgUto?start=305
+Clothing,Socks,https://www.youtube.com/embed//Uc4W8v1tm28
+Clothing,Hat,https://www.youtube.com/embed//bul0cjvDEEE
+Clothing,Glasses,https://www.youtube.com/embed//OoQMbKbdvpU
+Clothing,Sunglasses,https://www.youtube.com/embed/x38n4NAgUto?start=349
+Clothing,Watch,https://www.youtube.com/embed/x38n4NAgUto?start=370
+Clothing,Underwear,https://www.youtube.com/embed//yKAFC9iyxas
+Clothing,Bra,https://www.youtube.com/embed//BTVavVXqKnU
+Clothing,Swimsuit,https://www.youtube.com/embed/x38n4NAgUto?start=405
+Clothing,Gloves,https://www.youtube.com/embed//wOVDN0BUETY
+Clothing,Scarf,https://www.youtube.com/embed/x38n4NAgUto?start=420
+Clothing,Jewelry,https://www.youtube.com/embed/x38n4NAgUto?start=438
+Clothing,Earring,https://www.youtube.com/embed//FbO2p6yRM0E
+Clothing,Purse,https://www.youtube.com/embed//Dc9kKgOAKbQ
+Clothing,Backpack,https://www.youtube.com/embed/x38n4NAgUto?start=467
+Clothing,Pattern,https://www.youtube.com/embed/x38n4NAgUto?start=481
+Clothing,Plaid,https://www.youtube.com/embed/x38n4NAgUto?start=490
+Clothing,Stripes,https://www.youtube.com/embed/x38n4NAgUto?start=500
+Clothing,Polka Dots,https://www.youtube.com/embed/x38n4NAgUto?start=512
+Clothing,Scoop Neck,https://www.youtube.com/embed/x38n4NAgUto?start=523
+Clothing,Turtleneck,https://www.youtube.com/embed/x38n4NAgUto?start=532
+Clothing,V Neck,https://www.youtube.com/embed/x38n4NAgUto?start=541
+Clothing,Short Sleeves,https://www.youtube.com/embed/x38n4NAgUto?start=554
+Clothing,Long Sleeves,https://www.youtube.com/embed/x38n4NAgUto?start=563
+Clothing,Perfect,https://www.youtube.com/embed/x38n4NAgUto?start=586
+Clothing,Too Small,https://www.youtube.com/embed/x38n4NAgUto?start=603
+Clothing,Too Big,https://www.youtube.com/embed/x38n4NAgUto?start=616
+Clothing,Color,https://www.youtube.com/embed//R0MW-QKaqeQ
+Clothing,Match,https://www.youtube.com/embed/x38n4NAgUto?start=634
+Clothing,Zipper,https://www.youtube.com/embed/x38n4NAgUto?start=646
+Clothing,Buttons,https://www.youtube.com/embed/x38n4NAgUto?start=654
+Clothing,Tear/Rip,https://www.youtube.com/embed/x38n4NAgUto?start=669
+Clothing,Dirty,https://www.youtube.com/embed//sevZNt4lJFs
+Clothing,Clean,https://www.youtube.com/embed/x38n4NAgUto?start=691
+Clothing,Fancy,https://www.youtube.com/embed//_QX0o9Rlsng
+Clothing,Soft,https://www.youtube.com/embed//6-NPJ5P01Dw
+Clothing,Comfortable,https://www.youtube.com/embed//zb2vA4seUQg
+Clothing,Fabric,https://www.youtube.com/embed/x38n4NAgUto?start=746
+Clothing,Wool,https://www.youtube.com/embed/x38n4NAgUto?start=763
+Clothing,Cotton,https://www.youtube.com/embed/x38n4NAgUto?start=770
+Clothing,Leather,https://www.youtube.com/embed//D4b_EZhusLo
+Clothing,Lace,https://www.youtube.com/embed/x38n4NAgUto?start=787
+Church,Church,https://www.youtube.com/embed//MrQpEWyELqo
+Church,Bible,https://www.youtube.com/embed//BE8_mwL5cbs
+Church,Lord,https://www.youtube.com/embed//AXPF5iraUhc
+Church,Jesus,https://www.youtube.com/embed//PZpegBLONAU
+Church,King,https://www.youtube.com/embed//bqFZZOtu11I
+Church,Queen,https://www.youtube.com/embed//Yoz4qDqGNRI
+Church,Prince,https://www.youtube.com/embed//baMTmfL104E
+Church,Princess,https://www.youtube.com/embed//4FIhzY_uElw
+Church,Trinity,https://www.youtube.com/embed/1VNpO-DPYa4?start=111
+Church,God,https://www.youtube.com/embed//1nTH3wvLpY4
+Church,Son,https://www.youtube.com/embed//JtgGFe8HIFQ
+Church,Holy Spirit,https://www.youtube.com/embed/1VNpO-DPYa4?start=149
+Church,Angel,https://www.youtube.com/embed//MRKKCkGXUag
+Church,Heaven,https://www.youtube.com/embed//vSowMKjmI2A
+Church,Hell,https://www.youtube.com/embed/1VNpO-DPYa4?start=194
+Church,Devil,https://www.youtube.com/embed/1VNpO-DPYa4?start=204
+Church,Redeem,https://www.youtube.com/embed/1VNpO-DPYa4?start=211
+Church,Save,https://www.youtube.com/embed//PsEMHQEHNhE
+Church,Forgive,https://www.youtube.com/embed/1VNpO-DPYa4?start=233
+Church,Grace,https://www.youtube.com/embed/1VNpO-DPYa4?start=243
+Church,Love,https://www.youtube.com/embed//lRIRPw5EdSU
+Church,Bless,https://www.youtube.com/embed/1VNpO-DPYa4?start=264
+Church,Holy,https://www.youtube.com/embed/1VNpO-DPYa4?start=271
+Church,Resurrection,https://www.youtube.com/embed/1VNpO-DPYa4?start=286
+Church,Baptize,https://www.youtube.com/embed/1VNpO-DPYa4?start=297
+Church,Worship,https://www.youtube.com/embed/1VNpO-DPYa4?start=310
+Church,Praise,https://www.youtube.com/embed/1VNpO-DPYa4?start=323
+Church,Sing,https://www.youtube.com/embed/1VNpO-DPYa4?start=334
+Church,Pray,https://www.youtube.com/embed/1VNpO-DPYa4?start=345
+Church,Amen,https://www.youtube.com/embed/1VNpO-DPYa4?start=352
+Church,Communion,https://www.youtube.com/embed/1VNpO-DPYa4?start=364
+Church,Bread,https://www.youtube.com/embed//ZL0F8bLp8HY
+Church,Broken/Break/Broke,https://www.youtube.com/embed/1VNpO-DPYa4?start=388
+Church,Body,https://www.youtube.com/embed//9pcnTjM77rE
+Church,Wine,https://www.youtube.com/embed//3u3AQ4mzx6c
+Church,Cross,https://www.youtube.com/embed/1VNpO-DPYa4?start=421
+Church,Death/Die/Pass away,https://www.youtube.com/embed/1VNpO-DPYa4?start=431
+Emotions,Good/Well,https://www.youtube.com/embed/4Ll3OtqAzyw?start=343
+Emotions,Bad,https://www.youtube.com/embed//prwtXZ1o2As
+Emotions,Excited,https://www.youtube.com/embed//7jVM-HlaCUQ
+Emotions,Bored,https://www.youtube.com/embed//QvyazQaCmtM
+Emotions,Confused,https://www.youtube.com/embed//LJzalFEVIDc
+Emotions,Embarrassed,https://www.youtube.com/embed//AE3ARguhQwY
+Emotions,Shy,https://www.youtube.com/embed//O7dBt1V2b3Q
+Emotions,Happy,https://www.youtube.com/embed//ZXHHO_DY6_A
+Emotions,Sad,https://www.youtube.com/embed//zfkQYQhrZ6Q
+Emotions,Same ol' or the usual,https://www.youtube.com/embed/QYYMBAEs6Vg?start=178
+Emotions,So-so,https://www.youtube.com/embed//fhhBx_WQGAo
+Emotions,Fine,https://www.youtube.com/embed//OHHKerxHJjQ
+Emotions,Broken Hearted,https://www.youtube.com/embed/QYYMBAEs6Vg?start=204
+Emotions,Emotional,https://www.youtube.com/embed/QYYMBAEs6Vg?start=215
+Emotions,Busy,https://www.youtube.com/embed/4Ll3OtqAzyw?start=323
+Emotions,Frustrated,https://www.youtube.com/embed//0jV1TymgJyY
+Emotions,Mad or Angry,https://www.youtube.com/embed/QYYMBAEs6Vg?start=248
+Emotions,Nervous,https://www.youtube.com/embed/QYYMBAEs6Vg?start=258
+Emotions,Nothing or Nothing Much,https://www.youtube.com/embed/QYYMBAEs6Vg?start=268
+Emotions,Sick,https://www.youtube.com/embed//NBqpHJiufXU
+Emotions,Sleepy,https://www.youtube.com/embed//2LCp_ZNTwDA
+Emotions,Tired,https://www.youtube.com/embed//iZ6EeQqzZl0
+Emotions,To Be Afraid or Scared,https://www.youtube.com/embed/4Ll3OtqAzyw?start=290
+Emotions,Terrified,https://www.youtube.com/embed/4Ll3OtqAzyw?start=305
+Questions,Who,https://www.youtube.com/embed//pBnGrdxhxHQ
+Questions,What,https://www.youtube.com/embed//sSdQWC7mUZc
+Questions,When,https://www.youtube.com/embed//GC99dBIdtyg
+Questions,Where,https://www.youtube.com/embed//qxh-EVaK6kY
+Questions,Why,https://www.youtube.com/embed//K0yp2v6Atxs
+Questions,How,https://www.youtube.com/embed//awmySeWaTkk
+Routines,Get Ready,https://www.youtube.com/embed/3DLEb7h23jU?start=44
+Routines,Shower,https://www.youtube.com/embed//P7on9Ymhnu4
+Routines,Take a Bath,https://www.youtube.com/embed/3DLEb7h23jU?start=62
+Routines,Shave,https://www.youtube.com/embed/3DLEb7h23jU?start=71
+Routines,To put on makeup,https://www.youtube.com/embed/3DLEb7h23jU?start=87
+Routines,change clothes,https://www.youtube.com/embed/3DLEb7h23jU?start=98
+Routines,Comb Your Hair,https://www.youtube.com/embed/3DLEb7h23jU?start=112
+Routines,Brush Hair,https://www.youtube.com/embed/3DLEb7h23jU?start=122
+Routines,Brush Teeth,https://www.youtube.com/embed/3DLEb7h23jU?start=131
+Routines,Get Dressed,https://www.youtube.com/embed/3DLEb7h23jU?start=143
+Routines,Go to Bed,https://www.youtube.com/embed/3DLEb7h23jU?start=155
+Routines,To Fall Asleep,https://www.youtube.com/embed/3DLEb7h23jU?start=165
+Routines,Sleep,https://www.youtube.com/embed//dXEqaWSEztY
+Routines,Oversleep/Sleep-in,https://www.youtube.com/embed/3DLEb7h23jU?start=190
+Routines,Wake up,https://www.youtube.com/embed/3DLEb7h23jU?start=203
+Routines,Get up,https://www.youtube.com/embed/3DLEb7h23jU?start=212
+Routines,Rest/Relax,https://www.youtube.com/embed/3DLEb7h23jU?start=224
+Routines,Feed,https://www.youtube.com/embed//-0MHh_huRnI
+Routines,Eat Breakfast,https://www.youtube.com/embed/3DLEb7h23jU?start=245
+Routines,Eat Dinner,https://www.youtube.com/embed/3DLEb7h23jU?start=261
+Routines,Make,https://www.youtube.com/embed/3DLEb7h23jU?start=270
+Routines,Lunch,https://www.youtube.com/embed//9o5DDuSfZEs
+Routines,To go out,https://www.youtube.com/embed/3DLEb7h23jU?start=291
+Routines,Eat/Food,https://www.youtube.com/embed//2Dl1Q4vlQKs
+Routines,Cook,https://www.youtube.com/embed//Xy0FCuz1KHw
+Routines,Every Morning,https://www.youtube.com/embed//WOtg9I3en4Q
+Routines,Every Afternoon,https://www.youtube.com/embed//0pQmvgQuYHg
+Routines,Every Night,https://www.youtube.com/embed/3DLEb7h23jU?start=443
+Routines,Every Day,https://www.youtube.com/embed/3DLEb7h23jU?start=455
+Routines,Every Week,https://www.youtube.com/embed//xMrT3AcRL2Y
+Routines,Every Month,https://www.youtube.com/embed//nYuM6Vz4ApQ
+Routines,Every Year,https://www.youtube.com/embed//Nd-z2eWp0gc
+Routines,Every Once in a While,https://www.youtube.com/embed/3DLEb7h23jU?start=510
+Routines,Time,https://www.youtube.com/embed//ANRCVPkuN8Y
+Routines,Schedule/Calendar,https://www.youtube.com/embed/3DLEb7h23jU?start=542
+Routines,Early,https://www.youtube.com/embed//RSAwb_vK4hI
+Routines,Late,https://www.youtube.com/embed//9ul_1z23KLI
+Routines,Vary,https://www.youtube.com/embed/3DLEb7h23jU?start=577
+Routines,Set Your Alarm/Clock,https://www.youtube.com/embed/3DLEb7h23jU?start=585
+Routines,Always,https://www.youtube.com/embed//byJAh12NbRM
+Routines,Never,https://www.youtube.com/embed//ew7FIPLu5SE`;
+        DEFAULT_CSV_REF = DEFAULT_CSV_INLINE;
+        loadCSV(DEFAULT_CSV_INLINE, "default");
+      });
+
+      let activeList = "default";
+      let DEFAULT_CSV_REF = "";
+
+      function loadCSV(csv, listName) {
+        const lines = csv.split("\n");
+        const newWords = [];
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i].trim();
+          if (!line) continue;
+          if (
+            i === 0 &&
+            line.toLowerCase().includes("category") &&
+            line.toLowerCase().includes("word")
+          )
+            continue;
+          const parts = line.split(",").map((p) => p.trim());
+          if (parts.length >= 2 && parts[1]) {
+            newWords.push({
+              category: parts[0],
+              word: parts[1],
+              video_url: parts[2] || "",
+            });
+          }
+        }
+        if (newWords.length === 0) {
+          document.getElementById("cardContent").innerHTML =
+            '<div class="empty-state">No words found in list</div>';
+          return;
+        }
+        activeList = listName;
+        const btn = document.getElementById("switchListBtn");
+        if (btn)
+          btn.textContent =
+            activeList === "default"
+              ? "Switch to Top 1000"
+              : "Switch to Default";
+        allWords = newWords;
+        currentIndex = 0;
+        populateCategories();
+        filterWords();
+        updateStats();
+      }
+
+      function switchWordList() {
+        if (activeList === "default") {
+          loadCSV(TOP1000_CSV, "top1000");
+        } else {
+          loadCSV(DEFAULT_CSV_REF, "default");
+        }
+      }
+
+      function populateCategories() {
+        const select = document.getElementById("categorySelect");
+        const categories = new Set(allWords.map((w) => w.category));
+
+        select.innerHTML = '<option value="all">All</option>';
+        categories.forEach((cat) => {
+          const option = document.createElement("option");
+          option.value = cat;
+          option.textContent = cat;
+          select.appendChild(option);
+        });
+      }
+
+      function filterWords() {
+        const category = document.getElementById("categorySelect").value;
+
+        const filtered =
+          category === "all"
+            ? [...allWords]
+            : allWords.filter((w) => w.category === category);
+
+        // Remove duplicates by word text (case-insensitive), keeping first occurrence
+        const seen = new Set();
+        const deduped = filtered.filter((w) => {
+          const key = w.word.toLowerCase().trim();
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
         });
 
-        // Load data from localStorage on page load
-        window.addEventListener('load', () => {
-            const stored = localStorage.getItem('aslTrainerData');
-            if (stored) {
-                allWords = JSON.parse(stored);
-                populateCategories();
-                filterWords();
-                updateStats();
-            }
-        });
+        currentWords = shuffleArray(deduped);
+        currentIndex = 0;
+        showingHelp = false;
+        displayCard();
+        updateStats();
+      }
 
-        function loadDefaultList() {
-            fetch('defaultwords.csv')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Could not load defaultwords.csv');
-                    }
-                    return response.text();
-                })
-                .then(csv => {
-                    const lines = csv.split('\n');
-                    const newWords = [];
+      function displayCard() {
+        const content = document.getElementById("cardContent");
+        const videoPlayer = document.getElementById("videoPlayer");
+        const header = document.querySelector(".header");
+        const helpBtn = document.getElementById("helpBtn");
 
-                    for (let i = 0; i < lines.length; i++) {
-                        const line = lines[i].trim();
-                        if (!line) continue;
-
-                        // Skip header if it looks like one
-                        if (i === 0 && line.toLowerCase().includes('category') && line.toLowerCase().includes('word')) {
-                            continue;
-                        }
-
-                        const parts = line.split(',').map(p => p.trim());
-                        if (parts.length >= 2) {
-                            newWords.push({
-                                category: parts[0],
-                                word: parts[1],
-                                video_url: parts[2] || ''
-                            });
-                        }
-                    }
-
-                    if (newWords.length === 0) {
-                        alert('No valid data found in defaultwords.csv');
-                        return;
-                    }
-
-                    allWords = newWords;
-                    localStorage.setItem('aslTrainerData', JSON.stringify(allWords));
-                    
-                    populateCategories();
-                    filterWords();
-                    updateStats();
-                    alert(`Loaded ${newWords.length} words from default list!`);
-                })
-                .catch(error => {
-                    alert('Error loading default list: ' + error.message);
-                    console.error(error);
-                });
+        if (currentWords.length === 0) {
+          content.innerHTML =
+            '<div class="empty-state">No words available</div>';
+          videoPlayer.style.display = "none";
+          header.style.display = "flex";
+          helpBtn.disabled = true;
+          return;
         }
 
-        function loadData() {
-            const csv = document.getElementById('csvInput').value.trim();
-            if (!csv) {
-                alert('Please enter CSV data');
-                return;
-            }
+        const word = currentWords[currentIndex];
 
-            const lines = csv.split('\n');
-            const newWords = [];
-
-            for (let i = 0; i < lines.length; i++) {
-                const line = lines[i].trim();
-                if (!line) continue;
-
-                // Skip header if it looks like one
-                if (i === 0 && line.toLowerCase().includes('category') && line.toLowerCase().includes('word')) {
-                    continue;
-                }
-
-                const parts = line.split(',').map(p => p.trim());
-                if (parts.length >= 2) {
-                    newWords.push({
-                        category: parts[0],
-                        word: parts[1],
-                        video_url: parts[2] || ''
-                    });
-                }
-            }
-
-            if (newWords.length === 0) {
-                alert('No valid data found');
-                return;
-            }
-
-            allWords = newWords;
-            localStorage.setItem('aslTrainerData', JSON.stringify(allWords));
-            
-            populateCategories();
-            filterWords();
-            updateStats();
-            document.getElementById('csvInput').value = '';
-            alert(`Loaded ${newWords.length} words!`);
+        // Enable/disable help button based on video availability
+        if (word.video_url && word.video_url.trim() !== "") {
+          helpBtn.disabled = false;
+        } else {
+          helpBtn.disabled = true;
         }
 
-        function clearData() {
-            if (confirm('Are you sure you want to clear all data?')) {
-                allWords = [];
-                currentWords = [];
-                currentIndex = 0;
-                localStorage.removeItem('aslTrainerData');
-                pause();
-                populateCategories();
-                displayCard();
-                updateStats();
-            }
-        }
+        if (showingHelp && word.video_url) {
+          header.style.display = "none";
+          videoPlayer.style.display = "block";
+          // Clean up double slashes but keep them if that's what LifePrint uses
+          let videoUrl = word.video_url;
+          // Use autoplay with mute - browsers block autoplay with sound
+          if (!videoUrl.includes("?")) {
+            videoUrl += "?autoplay=1&mute=1&rel=0";
+          } else if (!videoUrl.includes("autoplay")) {
+            videoUrl += "&autoplay=1&mute=1";
+          }
+          console.log("Loading video URL:", videoUrl);
+          console.log(
+            "Video player element:",
+            document.getElementById("videoPlayer"),
+          );
+          console.log("IFrame element:", document.getElementById("asl_player"));
 
-        function populateCategories() {
-            const select = document.getElementById('categorySelect');
-            const categories = new Set(allWords.map(w => w.category));
-            
-            select.innerHTML = '<option value="all">All</option>';
-            categories.forEach(cat => {
-                const option = document.createElement('option');
-                option.value = cat;
-                option.textContent = cat;
-                select.appendChild(option);
-            });
-        }
+          const iframe = document.getElementById("asl_player");
+          iframe.src = videoUrl;
 
-        function filterWords() {
-            const category = document.getElementById('categorySelect').value;
-            
-            const filtered = category === 'all'
-                ? [...allWords]
-                : allWords.filter(w => w.category === category);
-
-            // Remove duplicates by word text (case-insensitive), keeping first occurrence
-            const seen = new Set();
-            const deduped = filtered.filter(w => {
-                const key = w.word.toLowerCase().trim();
-                if (seen.has(key)) return false;
-                seen.add(key);
-                return true;
-            });
-
-            currentWords = shuffleArray(deduped);
-            currentIndex = 0;
-            showingHelp = false;
-            displayCard();
-            updateStats();
-        }
-
-        function displayCard() {
-            const content = document.getElementById('cardContent');
-            const videoPlayer = document.getElementById('videoPlayer');
-            const header = document.querySelector('.header');
-            const helpBtn = document.getElementById('helpBtn');
-            
-            if (currentWords.length === 0) {
-                content.innerHTML = '<div class="empty-state">No words available</div>';
-                videoPlayer.style.display = 'none';
-                header.style.display = 'flex';
-                helpBtn.disabled = true;
-                return;
-            }
-
-            const word = currentWords[currentIndex];
-            
-            // Enable/disable help button based on video availability
-            if (word.video_url && word.video_url.trim() !== '') {
-                helpBtn.disabled = false;
-            } else {
-                helpBtn.disabled = true;
-            }
-            
-            if (showingHelp && word.video_url) {
-                header.style.display = 'none';
-                videoPlayer.style.display = 'block';
-                // Clean up double slashes but keep them if that's what LifePrint uses
-                let videoUrl = word.video_url;
-                // Use autoplay with mute - browsers block autoplay with sound
-                if (!videoUrl.includes('?')) {
-                    videoUrl += '?autoplay=1&mute=1&rel=0';
-                } else if (!videoUrl.includes('autoplay')) {
-                    videoUrl += '&autoplay=1&mute=1';
-                }
-                console.log('Loading video URL:', videoUrl);
-                console.log('Video player element:', document.getElementById('videoPlayer'));
-                console.log('IFrame element:', document.getElementById('asl_player'));
-                
-                const iframe = document.getElementById('asl_player');
-                iframe.src = videoUrl;
-                
-                content.innerHTML = `
+          content.innerHTML = `
                     <div class="word" style="margin-top: 20px;">${word.word}</div>
                     <div class="category-badge">${word.category}</div>
                     <div style="font-size: 14px; color: #999; margin-top: 15px;">
                         💡 Video will be muted for autoplay. Click to unmute.
                     </div>
                 `;
-            } else if (showingHelp && !word.video_url) {
-                header.style.display = 'none';
-                videoPlayer.style.display = 'none';
-                content.innerHTML = '<div class="no-video">No Video Defined</div>';
-            } else {
-                header.style.display = 'flex';
-                videoPlayer.style.display = 'none';
-                document.getElementById('asl_player').src = '';
-                content.innerHTML = `
+        } else if (showingHelp && !word.video_url) {
+          header.style.display = "none";
+          videoPlayer.style.display = "none";
+          content.innerHTML = '<div class="no-video">No Video Defined</div>';
+        } else {
+          header.style.display = "flex";
+          videoPlayer.style.display = "none";
+          document.getElementById("asl_player").src = "";
+          content.innerHTML = `
                     <div class="word">${word.word}</div>
                     <div class="category-badge">${word.category}</div>
                 `;
-            }
+        }
+      }
+
+      function extractYouTubeId(url) {
+        // Clean up URL (remove double slashes after embed/)
+        url = url.replace(/\/embed\/\//, "/embed/");
+
+        const patterns = [
+          /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+          /^([a-zA-Z0-9_-]{11})$/,
+        ];
+
+        for (const pattern of patterns) {
+          const match = url.match(pattern);
+          if (match) return match[1];
+        }
+        return null;
+      }
+
+      function shuffleArray(array) {
+        const shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+      }
+
+      function updateTimer() {
+        if (!isPlaying) return;
+
+        const now = Date.now();
+        const elapsed = now - timerStartTime;
+        const progress = Math.min((elapsed / timerDuration) * 100, 100);
+        document.getElementById("timerProgress").style.width = progress + "%";
+
+        if (nextWordTime && now >= nextWordTime) {
+          nextWordTime = null; // prevent double-fire before nextWord resets it
+          nextWord();
+        }
+      }
+
+      function startTimer() {
+        timerStartTime = Date.now();
+        timerDuration =
+          parseInt(document.getElementById("intervalInput").value) * 1000;
+        nextWordTime = timerStartTime + timerDuration;
+        document.getElementById("timerBar").style.display = "block";
+        document.getElementById("timerProgress").style.width = "0%";
+        if (timerIntervalId) clearInterval(timerIntervalId);
+        timerIntervalId = setInterval(updateTimer, 100);
+      }
+
+      function stopTimer() {
+        nextWordTime = null;
+        document.getElementById("timerBar").style.display = "none";
+        if (timerIntervalId) {
+          clearInterval(timerIntervalId);
+          timerIntervalId = null;
+        }
+      }
+
+      function unloadVideo() {
+        document.getElementById("asl_player").src = "";
+      }
+
+      // Resume auto-play from the current word/index without reshuffling
+      function resumePlay() {
+        if (currentWords.length === 0) return;
+        isPlaying = true;
+        showingHelp = false;
+        unloadVideo();
+        document.getElementById("playPauseBtn").innerHTML = "⏸️";
+        document.getElementById("playPauseBtn").classList.add("active");
+        displayCard();
+        startTimer();
+      }
+
+      function nextWord() {
+        if (currentWords.length === 0) return;
+
+        currentIndex = (currentIndex + 1) % currentWords.length;
+
+        showingHelp = false;
+        displayCard();
+
+        if (isPlaying) {
+          startTimer();
+        }
+      }
+
+      function previousWord() {
+        if (currentWords.length === 0) return;
+        if (showingHelp) {
+          // Return to the current word and resume playing
+          resumePlay();
+        } else {
+          pause();
+          currentIndex =
+            (currentIndex - 1 + currentWords.length) % currentWords.length;
+          showingHelp = false;
+          displayCard();
+        }
+      }
+
+      function nextWordManual() {
+        if (currentWords.length === 0) return;
+        if (showingHelp) {
+          // Advance to next word and resume playing
+          showingHelp = false;
+          unloadVideo();
+          currentIndex = (currentIndex + 1) % currentWords.length;
+          resumePlay();
+        } else {
+          pause();
+          currentIndex = (currentIndex + 1) % currentWords.length;
+          showingHelp = false;
+          displayCard();
+        }
+      }
+
+      function togglePlay() {
+        if (showingHelp) {
+          // Return to current word and start playing
+          resumePlay();
+        } else if (isPlaying) {
+          pause();
+        } else {
+          play();
+        }
+      }
+
+      function play() {
+        if (currentWords.length === 0) {
+          alert("No words available.");
+          return;
+        }
+        resumePlay();
+      }
+
+      function pause() {
+        isPlaying = false;
+        document.getElementById("playPauseBtn").innerHTML = "▶️";
+        document.getElementById("playPauseBtn").classList.remove("active");
+        stopTimer();
+      }
+
+      function showHelp() {
+        pause();
+
+        if (currentWords.length === 0) {
+          alert("No words available");
+          return;
         }
 
-        function extractYouTubeId(url) {
-            // Clean up URL (remove double slashes after embed/)
-            url = url.replace(/\/embed\/\//, '/embed/');
-            
-            const patterns = [
-                /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
-                /^([a-zA-Z0-9_-]{11})$/
-            ];
-            
-            for (const pattern of patterns) {
-                const match = url.match(pattern);
-                if (match) return match[1];
-            }
-            return null;
+        showingHelp = true;
+        displayCard();
+      }
+
+      function updateStats() {
+        const stats = document.getElementById("stats");
+        if (allWords.length > 0) {
+          stats.textContent = `Total words: ${allWords.length} | Current set: ${currentWords.length}`;
+        } else {
+          stats.textContent = "";
         }
+      }
 
-        function shuffleArray(array) {
-            const shuffled = [...array];
-            for (let i = shuffled.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-            }
-            return shuffled;
-        }
-
-        function updateTimer() {
-            if (!isPlaying) return;
-            
-            const now = Date.now();
-            const elapsed = now - timerStartTime;
-            const progress = Math.min((elapsed / timerDuration) * 100, 100);
-            document.getElementById('timerProgress').style.width = progress + '%';
-
-            if (nextWordTime && now >= nextWordTime) {
-                nextWordTime = null; // prevent double-fire before nextWord resets it
-                nextWord();
-            }
-        }
-
-        function startTimer() {
-            timerStartTime = Date.now();
-            timerDuration = parseInt(document.getElementById('intervalInput').value) * 1000;
-            nextWordTime = timerStartTime + timerDuration;
-            document.getElementById('timerBar').style.display = 'block';
-            document.getElementById('timerProgress').style.width = '0%';
-            if (timerIntervalId) clearInterval(timerIntervalId);
-            timerIntervalId = setInterval(updateTimer, 100);
-        }
-
-        function stopTimer() {
-            nextWordTime = null;
-            document.getElementById('timerBar').style.display = 'none';
-            if (timerIntervalId) {
-                clearInterval(timerIntervalId);
-                timerIntervalId = null;
-            }
-        }
-
-        function unloadVideo() {
-            document.getElementById('asl_player').src = '';
-        }
-
-        // Resume auto-play from the current word/index without reshuffling
-        function resumePlay() {
-            if (currentWords.length === 0) return;
-            isPlaying = true;
-            showingHelp = false;
-            unloadVideo();
-            document.getElementById('playPauseBtn').innerHTML = '⏸️';
-            document.getElementById('playPauseBtn').classList.add('active');
-            displayCard();
-            startTimer();
-        }
-
-        function nextWord() {
-            if (currentWords.length === 0) return;
-            
-            currentIndex = (currentIndex + 1) % currentWords.length;
-            
-            showingHelp = false;
-            displayCard();
-            
-            if (isPlaying) {
-                startTimer();
-            }
-        }
-
-        function previousWord() {
-            if (currentWords.length === 0) return;
-            if (showingHelp) {
-                // Return to the current word and resume playing
-                resumePlay();
-            } else {
-                pause();
-                currentIndex = (currentIndex - 1 + currentWords.length) % currentWords.length;
-                showingHelp = false;
-                displayCard();
-            }
-        }
-
-        function nextWordManual() {
-            if (currentWords.length === 0) return;
-            if (showingHelp) {
-                // Advance to next word and resume playing
-                showingHelp = false;
-                unloadVideo();
-                currentIndex = (currentIndex + 1) % currentWords.length;
-                resumePlay();
-            } else {
-                pause();
-                currentIndex = (currentIndex + 1) % currentWords.length;
-                showingHelp = false;
-                displayCard();
-            }
-        }
-
-        function togglePlay() {
-            if (showingHelp) {
-                // Return to current word and start playing
-                resumePlay();
-            } else if (isPlaying) {
-                pause();
-            } else {
-                play();
-            }
-        }
-
-        function play() {
-            if (currentWords.length === 0) {
-                alert('No words to practice. Please load data first.');
-                return;
-            }
-            resumePlay();
-        }
-
-        function pause() {
-            isPlaying = false;
-            document.getElementById('playPauseBtn').innerHTML = '▶️';
-            document.getElementById('playPauseBtn').classList.remove('active');
-            stopTimer();
-        }
-
-        function showHelp() {
-            pause();
-            
-            if (currentWords.length === 0) {
-                alert('No words available');
-                return;
-            }
-            
-            showingHelp = true;
-            displayCard();
-        }
-
-        function updateStats() {
-            const stats = document.getElementById('stats');
-            if (allWords.length > 0) {
-                stats.textContent = `Total words: ${allWords.length} | Current set: ${currentWords.length}`;
-            } else {
-                stats.textContent = '';
-            }
-        }
-
-        // Event listeners
-        document.getElementById('categorySelect').addEventListener('change', filterWords);
+      // Event listeners
+      document
+        .getElementById("categorySelect")
+        .addEventListener("change", filterWords);
     </script>
-</body>
+  </body>
 </html>
