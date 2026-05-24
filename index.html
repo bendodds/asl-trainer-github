@@ -409,6 +409,75 @@
         margin-top: 4px;
       }
 
+      /* ── Unknown words panel ─────────────────────────────────── */
+
+      .unknown-panel {
+        position: fixed;
+        right: 20px;
+        top: 20px;
+        bottom: 20px;
+        width: 180px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: none;
+        flex-direction: column;
+        padding: 15px;
+        z-index: 10;
+      }
+
+      .unknown-panel.visible {
+        display: flex;
+      }
+
+      .unknown-panel-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: #555;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 10px;
+        flex-shrink: 0;
+      }
+
+      .unknown-panel-count {
+        display: inline-block;
+        background: #dc3545;
+        color: white;
+        border-radius: 10px;
+        padding: 1px 7px;
+        font-size: 11px;
+        margin-left: 4px;
+      }
+
+      .unknown-panel-list {
+        flex: 1;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        min-height: 0;
+      }
+
+      .unknown-word-item {
+        font-size: 13px;
+        font-weight: 600;
+        color: #dc3545;
+        padding: 5px 8px;
+        background: #fff5f5;
+        border-radius: 5px;
+        border-left: 3px solid #dc3545;
+        flex-shrink: 0;
+      }
+
+      .unknown-panel-empty {
+        font-size: 12px;
+        color: #bbb;
+        text-align: center;
+        margin-top: 10px;
+        font-style: italic;
+      }
+
       /* ── User Selection Modal ─────────────────────────────────── */
 
       .modal-overlay {
@@ -676,6 +745,17 @@
 
     <div class="timer-bar" id="timerBar" style="display: none">
       <div class="timer-progress" id="timerProgress"></div>
+    </div>
+
+    <!-- Unknown words panel -->
+    <div class="unknown-panel" id="unknownPanel">
+      <div class="unknown-panel-title">
+        Still Learning
+        <span class="unknown-panel-count" id="unknownCount">0</span>
+      </div>
+      <div class="unknown-panel-list" id="unknownList">
+        <div class="unknown-panel-empty">None yet</div>
+      </div>
     </div>
 
     <!-- Celebration overlay -->
@@ -2461,6 +2541,7 @@ Routines,Never,https://www.youtube.com/embed//ew7FIPLu5SE`;
       let isLearningMode = false;
       let learningModeCounts = {};
       let currentLearningUser = null;
+      let sessionUnknownWords = [];
 
       // ── User management ────────────────────────────────────────────────────────
 
@@ -2650,6 +2731,8 @@ Routines,Never,https://www.youtube.com/embed//ew7FIPLu5SE`;
         isLearningMode = true;
         pause();
         loadLearningCounts();
+        sessionUnknownWords = [];
+        renderUnknownPanel();
         filterWords();
         const btn = document.getElementById("learningModeBtn");
         btn.textContent = "Exit Learning Mode";
@@ -2658,6 +2741,7 @@ Routines,Never,https://www.youtube.com/embed//ew7FIPLu5SE`;
         document.querySelector(".bottom-controls").style.display = "none";
         document.getElementById("intervalGroup").style.display = "none";
         document.getElementById("timerBar").style.display = "none";
+        document.getElementById("unknownPanel").classList.add("visible");
       }
 
       function exitLearningMode() {
@@ -2670,6 +2754,7 @@ Routines,Never,https://www.youtube.com/embed//ew7FIPLu5SE`;
         document.getElementById("userIndicator").textContent = "";
         document.querySelector(".bottom-controls").style.display = "flex";
         document.getElementById("intervalGroup").style.display = "flex";
+        document.getElementById("unknownPanel").classList.remove("visible");
       }
 
       function iKnowThis() {
@@ -2682,7 +2767,8 @@ Routines,Never,https://www.youtube.com/embed//ew7FIPLu5SE`;
       function iDontKnowThis() {
         const word = currentWords[currentIndex];
         const count = getLearningCount(word.word);
-        setLearningCount(word.word, 0);
+        setLearningCount(word.word, count === 1 ? 0 : 1);
+        addToUnknownPanel(word.word);
         showingHelp = true;
         displayCard();
       }
@@ -2742,6 +2828,26 @@ Routines,Never,https://www.youtube.com/embed//ew7FIPLu5SE`;
       function dismissSummary() {
         document.getElementById("summaryOverlay").classList.remove("open");
         displayCard();
+      }
+
+      function addToUnknownPanel(wordText) {
+        if (!sessionUnknownWords.includes(wordText)) {
+          sessionUnknownWords.unshift(wordText); // newest at top
+          renderUnknownPanel();
+        }
+      }
+
+      function renderUnknownPanel() {
+        const list = document.getElementById("unknownList");
+        const countEl = document.getElementById("unknownCount");
+        countEl.textContent = sessionUnknownWords.length;
+        if (sessionUnknownWords.length === 0) {
+          list.innerHTML = '<div class="unknown-panel-empty">None yet</div>';
+        } else {
+          list.innerHTML = sessionUnknownWords
+            .map((w) => `<div class="unknown-word-item">${escapeHtml(w)}</div>`)
+            .join("");
+        }
       }
 
       function launchConfetti() {
