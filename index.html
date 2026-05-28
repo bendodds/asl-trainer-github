@@ -803,6 +803,7 @@
 
       // Keyboard shortcuts
       document.addEventListener("keydown", (e) => {
+        if (isLearningMode) return;
         if (e.code === "Space") {
           e.preventDefault();
           togglePlay();
@@ -851,13 +852,13 @@ Top1000,ago,https://www.youtube.com/embed//YwOSUpJ6FmE
 Top1000,agree,https://www.youtube.com/embed//mfgzZNvZo9w
 Top1000,agreement,https://www.youtube.com/embed//mfgzZNvZo9w
 Top1000,ahead,https://www.youtube.com/embed//7Z1WMbq2Y6E
-Top1000,air,https://www.youtube.com/embed//8ph7VsLt1x0
+Top1000,air,https://www.youtube.com/embed//JQz_X4X7wHQ
 Top1000,all,https://www.youtube.com/embed//0DgYClc0e-E
 Top1000,allow,https://www.youtube.com/embed//TuvUnPJOLQI
 Top1000,almost,https://www.youtube.com/embed//lSLPqu_vm-k
-Top1000,alone,https://www.youtube.com/embed//gSOp3W9ZqRk
+Top1000,alone,https://www.youtube.com/embed//_Dy2bz-pEqI
 Top1000,along,https://www.youtube.com/embed//C7oTL0Mu5J4
-Top1000,already,https://www.youtube.com/embed//8bCNKNO17nQ
+Top1000,already,https://www.youtube.com/embed//w8Qh4XH-LSc
 Top1000,also,https://www.youtube.com/embed//1N4DfFk01h8
 Top1000,always,https://www.youtube.com/embed//byJAh12NbRM
 Top1000,American,https://www.youtube.com/embed//lmIYs4PRy8Q
@@ -2356,7 +2357,7 @@ Routines,Never,https://www.youtube.com/embed//ew7FIPLu5SE`;
             content.innerHTML = `
                       <div class="word">${word.word}</div>
                       <div class="category-badge">${word.category}</div>
-                      <div class="learning-badge">Seen correctly ${count} time${count !== 1 ? "s" : ""}</div>
+                      <div class="learning-badge">${count === null ? "First time seeing this" : count === 0 ? "Keep practicing" : `Familiarity score: ${count}`}</div>
                       <div class="learning-controls">
                         <button class="btn btn-know" onclick="iKnowThis()">✅ I know this</button>
                         <button class="btn btn-dont-know" onclick="iDontKnowThis()">❌ I don't know this</button>
@@ -2693,7 +2694,8 @@ Routines,Never,https://www.youtube.com/embed//ew7FIPLu5SE`;
       }
 
       function getLearningCount(word) {
-        return learningModeCounts[word.toLowerCase()] || 0;
+        const val = learningModeCounts[word.toLowerCase()];
+        return val === undefined ? null : val;
       }
 
       function setLearningCount(word, count) {
@@ -2702,7 +2704,7 @@ Routines,Never,https://www.youtube.com/embed//ew7FIPLu5SE`;
       }
 
       function getShowProbability(count) {
-        if (count <= 1) return 1.0;
+        if (count === null || count <= 1) return 1.0;
         if (count === 2) return 0.8;
         if (count === 3) return 0.5;
         if (count === 4) return 0.3;
