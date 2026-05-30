@@ -496,10 +496,8 @@
         flex-wrap: nowrap;
         gap: 2px;
         padding: 7px 10px;
-        background: rgba(255, 255, 255, 0.97);
-        border-top: 1px solid #ddd;
+        background: transparent;
         z-index: 10;
-        box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
       }
 
       .alphabet-bar.visible {
@@ -509,30 +507,30 @@
       .alpha-btn {
         width: 27px;
         height: 27px;
-        border: 1px solid #ddd;
+        border: none;
         border-radius: 4px;
-        background: white;
+        background: transparent;
         font-size: 11px;
         font-weight: 700;
         cursor: default;
-        color: #ccc;
+        color: rgba(255, 255, 255, 0.25);
         display: flex;
         align-items: center;
         justify-content: center;
         padding: 0;
-        transition: background 0.12s, color 0.12s, border-color 0.12s;
+        transition:
+          background 0.12s,
+          color 0.12s;
         flex-shrink: 0;
       }
 
       .alpha-btn.has-words {
-        background: #f0f4ff;
-        border-color: #667eea;
-        color: #667eea;
+        color: rgba(255, 255, 255, 0.9);
         cursor: pointer;
       }
 
       .alpha-btn.has-words:hover {
-        background: #667eea;
+        background: rgba(255, 255, 255, 0.2);
         color: white;
       }
 
@@ -961,7 +959,7 @@ Top1000,back,https://www.youtube.com/embed//qp7gCgcExlA
 Top1000,bad,https://www.youtube.com/embed//prwtXZ1o2As
 Top1000,bag,https://www.youtube.com/embed//8Y83mMqnOi8
 Top1000,ball,https://www.youtube.com/embed//vnmpdsQdbFc
-Top1000,bank,https://www.youtube.com/embed//AHYA_3qvZnM
+Top1000,bank,https://www.youtube.com/embed//yxQCw_MF3CQ
 Top1000,bar,https://www.youtube.com/embed//9Zli7o-T3CU
 Top1000,base,https://www.youtube.com/embed//spqSULYFquQ
 Top1000,be,https://www.youtube.com/embed//IUsxS-np-sE
@@ -2922,7 +2920,10 @@ Routines,Never,https://www.youtube.com/embed//ew7FIPLu5SE`;
           list.innerHTML = '<div class="unknown-panel-empty">None yet</div>';
         } else {
           list.innerHTML = sessionUnknownWords
-            .map((w) => `<div class="unknown-word-item" data-word="${escapeHtml(w)}" onclick="previewUnknownWord(this.dataset.word)" title="Watch video">🎬 ${escapeHtml(w)}</div>`)
+            .map(
+              (w) =>
+                `<div class="unknown-word-item" data-word="${escapeHtml(w)}" onclick="previewUnknownWord(this.dataset.word)" title="Watch video">🎬 ${escapeHtml(w)}</div>`,
+            )
             .join("");
         }
       }
@@ -2933,18 +2934,21 @@ Routines,Never,https://www.youtube.com/embed//ew7FIPLu5SE`;
           currentWords
             .filter((w) => w.word && w.word.length > 0)
             .map((w) => w.word[0].toUpperCase())
-            .filter((l) => /[A-Z]/.test(l))
+            .filter((l) => /[A-Z]/.test(l)),
         );
         bar.innerHTML = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
           .split("")
-          .map((l) => `<button class="alpha-btn ${available.has(l) ? "has-words" : ""}" onclick="jumpToLetter('${l}')">${l}</button>`)
+          .map(
+            (l) =>
+              `<button class="alpha-btn ${available.has(l) ? "has-words" : ""}" onclick="jumpToLetter('${l}')">${l}</button>`,
+          )
           .join("");
       }
 
       function jumpToLetter(letter) {
         if (!isLearningMode) return;
         const idx = currentWords.findIndex(
-          (w) => w.word && w.word[0].toUpperCase() === letter
+          (w) => w.word && w.word[0].toUpperCase() === letter,
         );
         if (idx === -1) return;
         currentIndex = idx;
