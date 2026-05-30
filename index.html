@@ -468,6 +468,13 @@
         border-radius: 5px;
         border-left: 3px solid #dc3545;
         flex-shrink: 0;
+        cursor: pointer;
+        transition: background 0.12s;
+      }
+
+      .unknown-word-item:hover {
+        background: #ffd6d6;
+        border-left-color: #b02a37;
       }
 
       .unknown-panel-empty {
@@ -476,6 +483,57 @@
         text-align: center;
         margin-top: 10px;
         font-style: italic;
+      }
+
+      /* ── Alphabet navigation bar ──────────────────────────────── */
+      .alphabet-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 220px;
+        display: none;
+        justify-content: center;
+        flex-wrap: nowrap;
+        gap: 2px;
+        padding: 7px 10px;
+        background: rgba(255, 255, 255, 0.97);
+        border-top: 1px solid #ddd;
+        z-index: 10;
+        box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+      }
+
+      .alphabet-bar.visible {
+        display: flex;
+      }
+
+      .alpha-btn {
+        width: 27px;
+        height: 27px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background: white;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: default;
+        color: #ccc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        transition: background 0.12s, color 0.12s, border-color 0.12s;
+        flex-shrink: 0;
+      }
+
+      .alpha-btn.has-words {
+        background: #f0f4ff;
+        border-color: #667eea;
+        color: #667eea;
+        cursor: pointer;
+      }
+
+      .alpha-btn.has-words:hover {
+        background: #667eea;
+        color: white;
       }
 
       /* ── User Selection Modal ─────────────────────────────────── */
@@ -758,6 +816,9 @@
       </div>
     </div>
 
+    <!-- Alphabet navigation bar (learning mode) -->
+    <div class="alphabet-bar" id="alphabetBar"></div>
+
     <!-- Celebration overlay -->
     <canvas id="confettiCanvas" style="display: none"></canvas>
     <div class="celebration-overlay" id="celebrationOverlay">
@@ -883,12 +944,11 @@ Top1000,arrive,https://www.youtube.com/embed//kgsXlwRNM6c
 Top1000,art,https://www.youtube.com/embed//x4SqnfZYRyc
 Top1000,article,https://www.youtube.com/embed//qrlFqLaaJSs
 Top1000,artist,https://www.youtube.com/embed//jORXCych9Q4
-Top1000,as,https://www.youtube.com/embed//LUThceuGTJ8
 Top1000,ask,https://www.youtube.com/embed//o2_DYu4TWcQ
 Top1000,assume,https://www.youtube.com/embed//B5oB0HgAxVo
-Top1000,at,https://www.youtube.com/embed//sh1LBgeZNnM
+Top1000,at,https://www.youtube.com/embed//UaTIUjLH1SE
 Top1000,attack,https://www.youtube.com/embed//ZdVZECH-0fI
-Top1000,attention,https://www.youtube.com/embed//kdT5GasyLbQ
+Top1000,attention,https://www.youtube.com/embed//v46z_XeyCi8
 Top1000,attorney,https://www.youtube.com/embed//HiXttg6T8DA
 Top1000,audience,https://www.youtube.com/embed//xJgSeKFtLQA
 Top1000,author,https://www.youtube.com/embed//upUoC-sDo8U
@@ -2284,8 +2344,10 @@ Routines,Never,https://www.youtube.com/embed//ew7FIPLu5SE`;
             ? getNextLearningIndex(currentWords.length - 1)
             : 0;
         showingHelp = false;
+        learningPreviewIndex = null;
         displayCard();
         updateStats();
+        if (isLearningMode) renderAlphabetBar();
       }
 
       function displayCard() {
@@ -2339,14 +2401,14 @@ Routines,Never,https://www.youtube.com/embed//ew7FIPLu5SE`;
                     <div style="font-size: 14px; color: #999; margin-top: 15px;">
                         💡 Video will be muted for autoplay. Click to unmute.
                     </div>
-                    ${isLearningMode ? '<div class="learning-controls"><button class="btn btn-continue" onclick="learningContinue()">Continue ➡️</button></div>' : ""}
+                    ${isLearningMode ? `<div class="learning-controls"><button class="btn btn-continue" onclick="learningContinue()">${learningPreviewIndex !== null ? "← Return to lesson" : "Continue ➡️"}</button></div>` : ""}
                 `;
         } else if (showingHelp && !word.video_url) {
           header.style.display = "none";
           videoPlayer.style.display = "none";
           content.innerHTML = `
             <div class="no-video">No Video Defined</div>
-            ${isLearningMode ? '<div class="learning-controls"><button class="btn btn-continue" onclick="learningContinue()">Continue ➡️</button></div>' : ""}
+            ${isLearningMode ? `<div class="learning-controls"><button class="btn btn-continue" onclick="learningContinue()">${learningPreviewIndex !== null ? "← Return to lesson" : "Continue ➡️"}</button></div>` : ""}
           `;
         } else {
           header.style.display = "flex";
@@ -2543,6 +2605,7 @@ Routines,Never,https://www.youtube.com/embed//ew7FIPLu5SE`;
       let learningModeCounts = {};
       let currentLearningUser = null;
       let sessionUnknownWords = [];
+      let learningPreviewIndex = null; // saved index while previewing a missed word
 
       // ── User management ────────────────────────────────────────────────────────
 
@@ -2731,6 +2794,7 @@ Routines,Never,https://www.youtube.com/embed//ew7FIPLu5SE`;
       function enterLearningMode(username) {
         currentLearningUser = username;
         isLearningMode = true;
+        learningPreviewIndex = null;
         pause();
         loadLearningCounts();
         sessionUnknownWords = [];
@@ -2744,10 +2808,12 @@ Routines,Never,https://www.youtube.com/embed//ew7FIPLu5SE`;
         document.getElementById("intervalGroup").style.display = "none";
         document.getElementById("timerBar").style.display = "none";
         document.getElementById("unknownPanel").classList.add("visible");
+        document.getElementById("alphabetBar").classList.add("visible");
       }
 
       function exitLearningMode() {
         isLearningMode = false;
+        learningPreviewIndex = null;
         currentLearningUser = null;
         filterWords();
         const btn = document.getElementById("learningModeBtn");
@@ -2757,6 +2823,7 @@ Routines,Never,https://www.youtube.com/embed//ew7FIPLu5SE`;
         document.querySelector(".bottom-controls").style.display = "flex";
         document.getElementById("intervalGroup").style.display = "flex";
         document.getElementById("unknownPanel").classList.remove("visible");
+        document.getElementById("alphabetBar").classList.remove("visible");
       }
 
       function iKnowThis() {
@@ -2776,7 +2843,15 @@ Routines,Never,https://www.youtube.com/embed//ew7FIPLu5SE`;
       }
 
       function learningContinue() {
-        advanceLearningWord();
+        if (learningPreviewIndex !== null) {
+          currentIndex = learningPreviewIndex;
+          learningPreviewIndex = null;
+          showingHelp = false;
+          unloadVideo();
+          displayCard();
+        } else {
+          advanceLearningWord();
+        }
       }
 
       function advanceLearningWord() {
@@ -2847,9 +2922,47 @@ Routines,Never,https://www.youtube.com/embed//ew7FIPLu5SE`;
           list.innerHTML = '<div class="unknown-panel-empty">None yet</div>';
         } else {
           list.innerHTML = sessionUnknownWords
-            .map((w) => `<div class="unknown-word-item">${escapeHtml(w)}</div>`)
+            .map((w) => `<div class="unknown-word-item" data-word="${escapeHtml(w)}" onclick="previewUnknownWord(this.dataset.word)" title="Watch video">🎬 ${escapeHtml(w)}</div>`)
             .join("");
         }
+      }
+
+      function renderAlphabetBar() {
+        const bar = document.getElementById("alphabetBar");
+        const available = new Set(
+          currentWords
+            .filter((w) => w.word && w.word.length > 0)
+            .map((w) => w.word[0].toUpperCase())
+            .filter((l) => /[A-Z]/.test(l))
+        );
+        bar.innerHTML = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+          .split("")
+          .map((l) => `<button class="alpha-btn ${available.has(l) ? "has-words" : ""}" onclick="jumpToLetter('${l}')">${l}</button>`)
+          .join("");
+      }
+
+      function jumpToLetter(letter) {
+        if (!isLearningMode) return;
+        const idx = currentWords.findIndex(
+          (w) => w.word && w.word[0].toUpperCase() === letter
+        );
+        if (idx === -1) return;
+        currentIndex = idx;
+        showingHelp = false;
+        learningPreviewIndex = null;
+        unloadVideo();
+        displayCard();
+      }
+
+      function previewUnknownWord(wordText) {
+        if (learningPreviewIndex === null) {
+          learningPreviewIndex = currentIndex;
+        }
+        const idx = currentWords.findIndex((w) => w.word === wordText);
+        if (idx === -1) return;
+        currentIndex = idx;
+        showingHelp = true;
+        displayCard();
       }
 
       function launchConfetti() {
