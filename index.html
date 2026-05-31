@@ -2598,7 +2598,16 @@ Routines,Never,https://www.youtube.com/embed//ew7FIPLu5SE`;
       function updateStats() {
         const stats = document.getElementById("stats");
         if (allWords.length > 0) {
-          stats.textContent = `Total words: ${allWords.length} | Current set: ${currentWords.length}`;
+          let text = `Total words: ${allWords.length} | Current set: ${currentWords.length}`;
+          if (isLearningMode) {
+            const learnedCount = allWords.filter(w => {
+              const c = getLearningCount(w.word);
+              return c !== null && c >= 4;
+            }).length;
+            const pct = Math.round((learnedCount / allWords.length) * 100);
+            text += ` | ${pct}% learned`;
+          }
+          stats.textContent = text;
         } else {
           stats.textContent = "";
         }
@@ -2769,6 +2778,7 @@ Routines,Never,https://www.youtube.com/embed//ew7FIPLu5SE`;
       function setLearningCount(word, count) {
         learningModeCounts[word.toLowerCase()] = Math.max(0, count);
         saveLearningCounts();
+        updateStats();
       }
 
       function getShowProbability(count) {
