@@ -2255,7 +2255,36 @@ Routines,Late,https://www.youtube.com/embed//9ul_1z23KLI
 Routines,Vary,https://www.youtube.com/embed/3DLEb7h23jU?start=577
 Routines,Set Your Alarm/Clock,https://www.youtube.com/embed/3DLEb7h23jU?start=585
 Routines,Always,https://www.youtube.com/embed//byJAh12NbRM
-Routines,Never,https://www.youtube.com/embed//ew7FIPLu5SE`;
+Routines,Never,https://www.youtube.com/embed//ew7FIPLu5SE
+Songs,Assurance,https://www.youtube.com/embed//WTSt-oSO6Ng
+Songs,Born,https://www.youtube.com/embed//GzafTsvZbD0
+Songs,Blood,https://www.youtube.com/watch?v=LQ1fOgCp8P0
+Songs,Enough,https://www.youtube.com/embed//XVgP90cND4M
+Songs,Fourth,https://www.youtube.com/embed//1cTHsO46Y-8
+Songs,Perfect,https://www.youtube.com/embed//Usr14aK8gjk
+Songs,Submission/surrender,https://www.youtube.com/embed//LS9NkmIllnQ
+Songs,Author,https://www.youtube.com/embed//upUoC-sDo8U
+Songs,Tomorrow,https://www.youtube.com/embed//xqKpafvUdZw
+Songs,Ordered,https://www.youtube.com/embed//rQCLv9G4axI
+Songs,Steps,https://www.youtube.com/embed//tKDUwnCents
+Songs,Then,https://www.youtube.com/embed//1a2K-NNgODY
+Songs,Sought,https://www.youtube.com/embed//S0388ARjqm0
+Songs,Heard,https://www.youtube.com/embed//CPAxecqxhzY
+Songs,Answered,https://www.youtube.com/embed//LjkLVzAtHyQ
+Songs,Silence,https://www.youtube.com/embed//xq2ZodH6gzk
+Songs,Empty,https://www.youtube.com/embed//HaB-QtL36VY
+Songs,Save,https://www.youtube.com/embed//PsEMHQEHNhE
+Songs,Power,https://www.youtube.com/embed//ec0H0c-Ppds
+Songs,King,https://www.youtube.com/embed//bqFZZOtu11I
+Songs,Over,https://www.youtube.com/embed//qo1LZm23Rxk
+Songs,Hold,https://www.youtube.com/embed//uyy0V5iKm0g
+Songs,Key,https://www.youtube.com/embed//fVzJr5q3noE
+Songs,Nail,https://www.youtube.com/embed//Txc84neZsh8
+Songs,Scarred,https://www.youtube.com/embed//994NjmMyTIA
+Songs,Hand,https://www.youtube.com/embed//9HK6J9Hbt8o
+Songs,Serpent,https://www.youtube.com/embed//joAF2ZzYG7Y
+Songs,Head,https://www.youtube.com/embed//9HK6J9Hbt8o
+Songs,Sting,https://www.youtube.com/embed//mSnoTVT9c8g`;
         DEFAULT_CSV_REF = DEFAULT_CSV_INLINE;
         loadCSV(DEFAULT_CSV_INLINE, "default");
       });
@@ -2600,7 +2629,7 @@ Routines,Never,https://www.youtube.com/embed//ew7FIPLu5SE`;
         if (allWords.length > 0) {
           let text = `Total words: ${allWords.length} | Current set: ${currentWords.length}`;
           if (isLearningMode) {
-            const learnedCount = allWords.filter(w => {
+            const learnedCount = allWords.filter((w) => {
               const c = getLearningCount(w.word);
               return c !== null && c >= 4;
             }).length;
